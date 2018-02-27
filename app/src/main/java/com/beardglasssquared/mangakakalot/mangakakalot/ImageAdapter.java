@@ -24,12 +24,15 @@ import java.util.ResourceBundle;
 public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ImageHolder>{
     Context context;
     RecyclerView rv;
-
+    RecyclerView.OnItemTouchListener disabler;
     List<String> urls;
+
     public ImageAdapter(List<String> urls, Context context, RecyclerView rv) {
         this.urls = urls;
         this.context = context;
         this.rv = rv;
+        disabler = new RecyclerViewDisabler();
+
     }
 
     @Override
@@ -42,15 +45,18 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ImageHolder>
         Picasso.with(context).load(urls.get(position)).into(holder.vPhotoView);
         final CardView cv = holder.vCardView;
         final PhotoView pv = holder.vPhotoView;
+        final int p = position;
         //this is where I can change the views to act the way I want with "setOn<Event>"
+
 
         holder.vPhotoView.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View view) {
+                rv.smoothScrollToPosition(p);
+
                 if (pv.getScale() != 1.0f) {
                     pv.setZoomTransitionDuration(50);
                     pv.setScale(1.0f,true);
-
                 } else {
 
                 }
@@ -58,9 +64,7 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ImageHolder>
             }
         });
 
-
     }
-
     @Override
     public ImageHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
         View itemView = LayoutInflater.
@@ -81,3 +85,5 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ImageHolder>
         }
     }
 }
+
+

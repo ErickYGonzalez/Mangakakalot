@@ -10,6 +10,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -34,15 +35,9 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        //Remove notification bar
-        //this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
-
-
-
-
-
         setContentView(R.layout.activity_main);
 
+        //Pulls the urls for manga images
         imageLoader = new LoadImage(manga,String.valueOf(chapterNumber));
         imageLoader.execute();
     }
@@ -60,7 +55,7 @@ public class MainActivity extends AppCompatActivity {
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
+        //TODO: Change this to a more robust system
         if (id == R.id.previous) {
             if (chapterNumber > 1) {
                 chapterNumber--;
@@ -99,11 +94,11 @@ public class MainActivity extends AppCompatActivity {
         ProgressBar pb;
         RecyclerView rv;
 
-        public LoadImage(String managaName, String chapterNumber)
-        {
+        public LoadImage(String managaName, String chapterNumber) {
             this.mangaName = managaName;
             this.chapterNumber = chapterNumber;
         }
+
         @Override
         protected List<String> doInBackground(String... strings) {
 
@@ -116,15 +111,17 @@ public class MainActivity extends AppCompatActivity {
                 URL url = new URL(rootUrl + mangaName + "/chapter_" + chapterNumber);
 
 
-
                 //stuff setting up just to make it connect
                 HttpURLConnection connection = (HttpURLConnection) url.openConnection();
                 if (connection instanceof HttpURLConnection) {
                     HttpURLConnection httpURLConnection = (HttpURLConnection) connection;
                     int response = -1;
+                    //Due to security protocol with the website, this is need in before the connection
+                    //I think it tricks the server to thinking this is a pc
                     httpURLConnection.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.95 Safari/537.11");
                     httpURLConnection.connect();
                     response = httpURLConnection.getResponseCode();
+
                     if (response == HttpURLConnection.HTTP_OK) {
                         is = httpURLConnection.getInputStream();
                         BufferedReader in = new BufferedReader(new InputStreamReader(is));
@@ -132,19 +129,17 @@ public class MainActivity extends AppCompatActivity {
                         //Where reading from html code starts
                         String inputLine;
                         while ((inputLine = in.readLine()) != null) {
-                            if (inputLine.contains("vungdoc"))
-                            {
+                            // vungdoc is the keyword to start looking for image urls
+                            if (inputLine.contains("vungdoc")) {
                                 inputLine = in.readLine();
                                 String[] imagesInfo = inputLine.split("<img src=");
-                                for (int i = 1; i < imagesInfo.length;i++)
-                                {
+                                for (int i = 1; i < imagesInfo.length; i++) {
                                     String s = imagesInfo[i];
-                                    urls.add(s.substring(s.indexOf("http"), s.indexOf(".jpg")+4));
+                                    urls.add(s.substring(s.indexOf("http"), s.indexOf(".jpg") + 4));
                                 }
 
-                                for (String s : urls)
-                                {
-                                    Log.d("URL" , s);
+                                for (String s : urls) {
+                                    Log.d("URL", s);
                                 }
                             }
                         }
@@ -169,11 +164,12 @@ public class MainActivity extends AppCompatActivity {
             pb = findViewById(R.id.progressBar);
             rv = findViewById(R.id.recycle_view);
 
+
             LinearLayoutManager llm = new LinearLayoutManager(getApplicationContext());
             llm.setOrientation(LinearLayoutManager.VERTICAL);
             rv.setLayoutManager(llm);
 
-            ImageAdapter ca = new ImageAdapter(urls,getApplicationContext(),rv);
+            ImageAdapter ca = new ImageAdapter(urls, getApplicationContext(), rv);
             rv.setAdapter(ca);
 
             rv.setVisibility(View.VISIBLE);
