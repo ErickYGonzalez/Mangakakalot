@@ -18,10 +18,10 @@ import java.util.List;
  */
 public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ImageHolder>{
     Context context;
-    RecyclerView rv;
+    MultiClickRecyclerView rv;
     List<String> urls;
 
-    public ImageAdapter(List<String> urls, Context context, RecyclerView rv) {
+    public ImageAdapter(List<String> urls, Context context, MultiClickRecyclerView rv) {
         this.urls = urls;
         this.context = context;
         this.rv = rv;
@@ -56,6 +56,7 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ImageHolder>
         });*/
 
         holder.vPhotoView.setOnTouchListener(new ZoomedScroll(holder.vPhotoView,rv,position));
+
 
     }
     @Override

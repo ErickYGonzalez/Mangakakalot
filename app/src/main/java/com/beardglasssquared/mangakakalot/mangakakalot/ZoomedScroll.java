@@ -23,7 +23,8 @@ public class ZoomedScroll implements View.OnTouchListener {
     private PhotoView photoView;
     private RecyclerView recyclerView;
     private int position;
-    RecyclerViewDisabler disabler;
+
+    private boolean isLongPressed = false, isDown = true;
 
 
     public ZoomedScroll(PhotoView photoView, RecyclerView recyclerView, int position)
@@ -32,8 +33,9 @@ public class ZoomedScroll implements View.OnTouchListener {
         this.photoView = photoView;
         this.recyclerView = recyclerView;
         this.position = position;
-        disabler = new RecyclerViewDisabler();
     }
+
+
 
     @Override
     public boolean onTouch(View view, MotionEvent ev) {
@@ -47,11 +49,12 @@ public class ZoomedScroll implements View.OnTouchListener {
                 // Save the ID of this pointer (for dragging)
                 mActivePointerId = MotionEventCompat.getPointerId(ev, 0);
 
-                photoView.setScale(1.5f,xOffset,yOffset,true);
+
+                Log.d("Anchor: ", "x = " + String.valueOf(xOffset) + ", y = " + String.valueOf(yOffset) );
 
                 //disable scrolling
                 recyclerView.smoothScrollToPosition(position);
-                recyclerView.addOnItemTouchListener(disabler);
+                photoView.setScale(1.5f,xOffset ,yOffset ,true);
 
                 break;
             }
@@ -65,13 +68,17 @@ public class ZoomedScroll implements View.OnTouchListener {
                 xOffset = ev.getX();
                 yOffset = ev.getY();
 
-                Log.d("Touch Event Move: ", "x = " + String.valueOf(xOffset) + "/" + String.valueOf(width) +
-                                                    " y = " + String.valueOf(yOffset) + "/" + String.valueOf(height));
-                Log.d("PhotoView Specs:", "maxWidth = " + String.valueOf(photoView.getMaxWidth() + " maxHeight = " + String.valueOf(photoView.getMaxHeight())));
+                Log.d("Anchor: ", "x = " + String.valueOf(xOffset) + ", y = " + String.valueOf(yOffset) );
 
-                photoView.setScale(1.5f,xOffset,yOffset,false);
+                //Log.d("Move: ", "x = " + String.valueOf(xOffset) + "/" + String.valueOf(width) +
+                //                                  " y = " + String.valueOf(yOffset) + "/" + String.valueOf(height));
+                //Log.d("PhotoView Specs:", "maxWidth = " + String.valueOf(photoView.getMaxWidth() + " maxHeight = " + String.valueOf(photoView.getMaxHeight())));
 
-                //TODO: Disable rv scrolling on touch
+                photoView.setScale(1.5f,xOffset ,yOffset ,false);
+
+                //Disables Scrollview
+                //TODO: Only enable this when long pressed
+                recyclerView.stopScroll();
 
                 break;
             }

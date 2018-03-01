@@ -30,7 +30,9 @@ public class MainActivity extends AppCompatActivity {
 
     int chapterNumber = 1;
     LoadImage imageLoader;
-    String manga = "goblin_slayer";
+    String manga = "kobayashisan_chi_no_maid_dragon";
+    //String manga = "goblin_slayer";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -92,7 +94,7 @@ public class MainActivity extends AppCompatActivity {
         String mangaName;
         String chapterNumber;
         ProgressBar pb;
-        RecyclerView rv;
+        MultiClickRecyclerView rv;
 
         public LoadImage(String managaName, String chapterNumber) {
             this.mangaName = managaName;
