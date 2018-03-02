@@ -152,7 +152,7 @@ public class ZoomedScroll implements View.OnTouchListener {
         {
             return 0;
         } else {
-            return yTouch * 2 - height;
+            return yTouch * 3 - 3 * height /2;
         }
     }
 

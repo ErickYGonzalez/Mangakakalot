@@ -10,7 +10,7 @@
         android:title="Next"
         app:showAsAction="always" />
     <item
-        android:id="@+id/changeManga"
-        android:title="Change Manga"
+        android:id="@+id/changeChapter"
+        android:title="Chapter Select"
         app:showAsAction="never" />
 </menu>

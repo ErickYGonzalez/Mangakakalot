@@ -1,12 +1,16 @@
 package com.beardglasssquared.mangakakalot.mangakakalot;
 
+import android.app.Dialog;
+import android.content.DialogInterface;
 import android.os.AsyncTask;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -14,6 +18,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.EditText;
 import android.widget.PopupMenu;
 import android.widget.ProgressBar;
 import android.widget.Toast;
@@ -83,21 +88,36 @@ public class MainActivity extends AppCompatActivity {
             imageLoader.execute();
             return true;
         }
-        if (id == R.id.changeManga)
+        if (id == R.id.changeChapter)
         {
-            if (manga.equals("goblin_slayer")){
-                manga = "kobayashisan_chi_no_maid_dragon";
-            } else {
-                manga = "goblin_slayer";
-            }
-            chapterNumber = 1;
-            imageLoader.cancel(true);
+            final Dialog dialog = new Dialog(MainActivity.this);
+            dialog.setContentView(R.layout.chapter_select);
+            dialog.findViewById(R.id.button_chapter_select_go).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    EditText text = (EditText) dialog.findViewById(R.id.text_chapter_number);
+                    String chapter = text.getText().toString();
 
-            findViewById(R.id.recycle_view).setVisibility(View.GONE);
-            findViewById(R.id.progressBar).setVisibility(View.VISIBLE);
-            imageLoader = new LoadImage(manga,String.valueOf(chapterNumber));
-            imageLoader.execute();
+                    chapterNumber = Integer.parseInt(chapter);
+                    imageLoader.cancel(true);
 
+                    findViewById(R.id.recycle_view).setVisibility(View.GONE);
+                    findViewById(R.id.progressBar).setVisibility(View.VISIBLE);
+                    imageLoader = new LoadImage(manga,chapter);
+                    imageLoader.execute();
+
+                    dialog.dismiss();
+                }
+            });
+
+            dialog.findViewById(R.id.button_chapter_select_cancel).setOnClickListener(new View.OnClickListener() {
+                  @Override
+                  public void onClick(View view) {
+                    dialog.dismiss();
+                  }
+              });
+
+            dialog.show();
         }
 
         return super.onOptionsItemSelected(item);
