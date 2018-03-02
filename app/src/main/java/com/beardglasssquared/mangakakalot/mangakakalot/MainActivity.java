@@ -30,7 +30,9 @@ public class MainActivity extends AppCompatActivity {
 
     int chapterNumber = 1;
     LoadImage imageLoader;
-    String manga = "kobayashisan_chi_no_maid_dragon";
+
+    String manga = "/read_dragon_ball_manga_online_for_free2";
+
     //String manga = "goblin_slayer";
 
     @Override
@@ -83,6 +85,18 @@ public class MainActivity extends AppCompatActivity {
         }
         if (id == R.id.changeManga)
         {
+            if (manga.equals("goblin_slayer")){
+                manga = "kobayashisan_chi_no_maid_dragon";
+            } else {
+                manga = "goblin_slayer";
+            }
+            chapterNumber = 1;
+            imageLoader.cancel(true);
+
+            findViewById(R.id.recycle_view).setVisibility(View.GONE);
+            findViewById(R.id.progressBar).setVisibility(View.VISIBLE);
+            imageLoader = new LoadImage(manga,String.valueOf(chapterNumber));
+            imageLoader.execute();
 
         }
 
@@ -109,7 +123,8 @@ public class MainActivity extends AppCompatActivity {
             List<String> urls = new ArrayList<>();
             try {
                 //This is where the input box and number picker changes the manga
-                String rootUrl = "http://mangakakalot.com/chapter/";
+                //String rootUrl = "http://mangakakalot.com/chapter/";
+                String rootUrl = "http://manganelo.com/chapter"; //this is the root for dragon ball
                 URL url = new URL(rootUrl + mangaName + "/chapter_" + chapterNumber);
 
 
