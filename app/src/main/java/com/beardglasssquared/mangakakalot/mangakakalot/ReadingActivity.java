@@ -1,6 +1,7 @@
 package com.beardglasssquared.mangakakalot.mangakakalot;
 
 import android.app.Dialog;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -39,11 +40,14 @@ public class ReadingActivity extends AppCompatActivity {
         Bundle extras = getIntent().getExtras();
 
         chapterUrls = extras.getStringArray("chapterUrls");
+        chapterNumber = extras.getInt("chapterNumber");
 
 
         //Pulls the urls for manga images
         imageLoader = new LoadImage(chapterUrls[chapterNumber]);
         imageLoader.execute();
+
+
     }
 
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -61,7 +65,7 @@ public class ReadingActivity extends AppCompatActivity {
 
         //TODO: Change this to a more robust system
         if (id == R.id.previous) {
-            if (chapterNumber > 1) {
+            if (chapterNumber > 0) {
                 chapterNumber--;
                 findViewById(R.id.recycle_view).setVisibility(View.GONE);
                 findViewById(R.id.progressBar).setVisibility(View.VISIBLE);

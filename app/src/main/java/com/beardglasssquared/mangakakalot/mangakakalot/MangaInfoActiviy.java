@@ -1,13 +1,13 @@
 package com.beardglasssquared.mangakakalot.mangakakalot;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
@@ -22,8 +22,6 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 public class MangaInfoActiviy extends AppCompatActivity {
@@ -31,7 +29,7 @@ public class MangaInfoActiviy extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_manga_info_activiy);
+        setContentView(R.layout.manga_info_activity);
 
         ImageView mangaCover = findViewById(R.id.manga_cover);
 
@@ -43,12 +41,14 @@ public class MangaInfoActiviy extends AppCompatActivity {
         Picasso.with(getApplicationContext()).load(imgurl).into(mangaCover);
 
         Toolbar toolbar = (Toolbar)findViewById(R.id.toolbar);
+
         setSupportActionBar(toolbar);
+        toolbar.setTitleTextColor(Color.parseColor("#ffffff"));
         if (getSupportActionBar() != null)
         {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setTitle(name);
         }
-
         LoadChapters loadChapters = new LoadChapters(mangaUrl);
         loadChapters.execute();
     }

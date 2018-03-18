@@ -21,4 +21,13 @@
         tools:layout_editor_absoluteY="8dp">
 
     </com.beardglasssquared.mangakakalot.mangakakalot.MultiClickRecyclerView>
+
+    <android.support.v7.widget.Toolbar
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:layout_alignBottom="@id/recycle_view"
+        android:elevation="@dimen/cardview_default_elevation">
+
+
+    </android.support.v7.widget.Toolbar>
 </RelativeLayout>

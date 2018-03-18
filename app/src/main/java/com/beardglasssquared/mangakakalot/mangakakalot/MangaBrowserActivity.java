@@ -1,12 +1,17 @@
 package com.beardglasssquared.mangakakalot.mangakakalot;
 
+import android.app.Dialog;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
@@ -30,6 +35,51 @@ public class MangaBrowserActivity extends AppCompatActivity {
 
         lpp = new LoadPopularPage(pageNumber);
         lpp.execute();
+    }
+
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.main_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+
+        //TODO: Change this to a more robust system
+        if (id == R.id.previous) {
+            if (pageNumber > 1) {
+                pageNumber--;
+                findViewById(R.id.recycle_view).setVisibility(View.GONE);
+                findViewById(R.id.progressBar).setVisibility(View.VISIBLE);
+
+                lpp.cancel(true);
+                lpp = new LoadPopularPage(pageNumber);
+                lpp.execute();
+            }
+            return true;
+        }
+        if (id == R.id.next)
+        {
+            pageNumber++;
+            findViewById(R.id.recycle_view).setVisibility(View.GONE);
+            findViewById(R.id.progressBar).setVisibility(View.VISIBLE);
+
+            lpp.cancel(true);
+            lpp = new LoadPopularPage(pageNumber);
+            lpp.execute();
+            return true;
+        }
+        if (id == R.id.changeChapter)
+        {
+
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 
 

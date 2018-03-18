@@ -33,9 +33,9 @@ public class MoreInfoAdapter extends RecyclerView.Adapter<MoreInfoAdapter.MoreIn
     }
 
     @Override
-    public void onBindViewHolder(MoreInfoAdapter.MoreInfoHolder holder, int position) {
+    public void onBindViewHolder(MoreInfoAdapter.MoreInfoHolder holder, final int position) {
         String url = urls.get(position);
-        holder.tv.setText(url.substring(url.indexOf("chapter_") + "chapter_".length()));
+        holder.tv.setText("Chapter " + url.substring(url.indexOf("chapter_") + "chapter_".length()));
         holder.tv.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -43,7 +43,7 @@ public class MoreInfoAdapter extends RecyclerView.Adapter<MoreInfoAdapter.MoreIn
                 String[] chapterUrls = new String[urls.size()];
                 chapterUrls = urls.toArray(chapterUrls);
                 intent.putExtra("chapterUrls",chapterUrls);
-
+                intent.putExtra("chapterNumber",position);
                 context.startActivity(intent);
             }
         });
