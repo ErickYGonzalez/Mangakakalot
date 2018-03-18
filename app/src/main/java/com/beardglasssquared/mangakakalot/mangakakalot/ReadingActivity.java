@@ -1,25 +1,16 @@
 package com.beardglasssquared.mangakakalot.mangakakalot;
 
 import android.app.Dialog;
-import android.content.DialogInterface;
 import android.os.AsyncTask;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
-import android.view.Window;
-import android.view.WindowManager;
 import android.widget.EditText;
-import android.widget.PopupMenu;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
@@ -31,12 +22,11 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity {
+public class ReadingActivity extends AppCompatActivity {
 
-    int chapterNumber = 1;
+    int chapterNumber = 0;
     LoadImage imageLoader;
-
-    String manga = "/read_dragon_ball_manga_online_for_free2";
+    String[] chapterUrls;
 
     //String manga = "goblin_slayer";
 
@@ -44,10 +34,15 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.reading_activity);
+
+        Bundle extras = getIntent().getExtras();
+
+        chapterUrls = extras.getStringArray("chapterUrls");
+
 
         //Pulls the urls for manga images
-        imageLoader = new LoadImage(manga,String.valueOf(chapterNumber));
+        imageLoader = new LoadImage(chapterUrls[chapterNumber]);
         imageLoader.execute();
     }
 
@@ -72,7 +67,7 @@ public class MainActivity extends AppCompatActivity {
                 findViewById(R.id.progressBar).setVisibility(View.VISIBLE);
 
                 imageLoader.cancel(true);
-                imageLoader = new LoadImage(manga,String.valueOf(chapterNumber));
+                imageLoader = new LoadImage(chapterUrls[chapterNumber]);
                 imageLoader.execute();
             }
             return true;
@@ -84,13 +79,13 @@ public class MainActivity extends AppCompatActivity {
 
             findViewById(R.id.recycle_view).setVisibility(View.GONE);
             findViewById(R.id.progressBar).setVisibility(View.VISIBLE);
-            imageLoader = new LoadImage(manga,String.valueOf(chapterNumber));
+            imageLoader = new LoadImage(chapterUrls[chapterNumber]);
             imageLoader.execute();
             return true;
         }
         if (id == R.id.changeChapter)
         {
-            final Dialog dialog = new Dialog(MainActivity.this);
+            final Dialog dialog = new Dialog(ReadingActivity.this);
             dialog.setContentView(R.layout.chapter_select);
             dialog.findViewById(R.id.button_chapter_select_go).setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -103,7 +98,7 @@ public class MainActivity extends AppCompatActivity {
 
                     findViewById(R.id.recycle_view).setVisibility(View.GONE);
                     findViewById(R.id.progressBar).setVisibility(View.VISIBLE);
-                    imageLoader = new LoadImage(manga,chapter);
+                    imageLoader = new LoadImage(chapterUrls[Integer.parseInt(chapter)]);
                     imageLoader.execute();
 
                     dialog.dismiss();
@@ -126,13 +121,11 @@ public class MainActivity extends AppCompatActivity {
 
     public class LoadImage extends AsyncTask<String, Void, List<String>> {
         String mangaName;
-        String chapterNumber;
         ProgressBar pb;
         MultiClickRecyclerView rv;
 
-        public LoadImage(String managaName, String chapterNumber) {
+        public LoadImage(String managaName) {
             this.mangaName = managaName;
-            this.chapterNumber = chapterNumber;
         }
 
         @Override
@@ -140,12 +133,12 @@ public class MainActivity extends AppCompatActivity {
 
 
             InputStream is;
+
+            //urls of images
             List<String> urls = new ArrayList<>();
             try {
-                //This is where the input box and number picker changes the manga
-                //String rootUrl = "http://mangakakalot.com/chapter/";
-                String rootUrl = "http://manganelo.com/chapter"; //this is the root for dragon ball
-                URL url = new URL(rootUrl + mangaName + "/chapter_" + chapterNumber);
+                //url of page
+                URL url = new URL(mangaName);
 
 
                 //stuff setting up just to make it connect
