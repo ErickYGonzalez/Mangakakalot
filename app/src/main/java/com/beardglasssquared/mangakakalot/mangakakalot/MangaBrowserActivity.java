@@ -14,6 +14,7 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.Toast;
+import android.widget.Toolbar;
 
 import java.io.BufferedReader;
 import java.io.InputStream;
@@ -57,6 +58,8 @@ public class MangaBrowserActivity extends AppCompatActivity {
                 findViewById(R.id.recycle_view).setVisibility(View.GONE);
                 findViewById(R.id.progressBar).setVisibility(View.VISIBLE);
 
+                Toast.makeText(getApplicationContext(),"Page: " + String.valueOf(pageNumber), Toast.LENGTH_LONG).show();
+
                 lpp.cancel(true);
                 lpp = new LoadPopularPage(pageNumber);
                 lpp.execute();
@@ -68,6 +71,9 @@ public class MangaBrowserActivity extends AppCompatActivity {
             pageNumber++;
             findViewById(R.id.recycle_view).setVisibility(View.GONE);
             findViewById(R.id.progressBar).setVisibility(View.VISIBLE);
+
+            Toast.makeText(getApplicationContext(),"Page: " + String.valueOf(pageNumber), Toast.LENGTH_LONG).show();
+
 
             lpp.cancel(true);
             lpp = new LoadPopularPage(pageNumber);

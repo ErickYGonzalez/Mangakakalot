@@ -42,13 +42,11 @@ public class MangaInfoActiviy extends AppCompatActivity {
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
 
         toolbar.setTitleTextColor(Color.parseColor("#ffffff"));
-        if (getSupportActionBar() != null)
-        {
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-            getSupportActionBar().setTitle(name);
-        }
+
         LoadChapters loadChapters = new LoadChapters(mangaUrl);
         loadChapters.execute();
     }
@@ -58,8 +56,7 @@ public class MangaInfoActiviy extends AppCompatActivity {
         switch (item.getItemId()) {
             // Respond to the action bar's Up/Home button
             case android.R.id.home:
-                Intent i = new Intent(this,ReadingActivity.class);
-                startActivity(i);
+                this.finish();
                 return true;
         }
         return super.onOptionsItemSelected(item);

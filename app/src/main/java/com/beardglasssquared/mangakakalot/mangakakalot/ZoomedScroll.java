@@ -50,7 +50,7 @@ public class ZoomedScroll implements View.OnTouchListener {
                 mActivePointerId = MotionEventCompat.getPointerId(ev, 0);
 
 
-                Log.d("Anchor: ", "x = " + String.valueOf(xTouch) + ", y = " + String.valueOf(yTouch) );
+                //Log.d("Anchor: ", "x = " + String.valueOf(xTouch) + ", y = " + String.valueOf(yTouch) );
 
                 /*
                 //disable scrolling
