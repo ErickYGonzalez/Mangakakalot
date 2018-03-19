@@ -2,18 +2,23 @@ package com.beardglasssquared.mangakakalot.mangakakalot;
 
 import android.app.Dialog;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.Toast;
+
 
 import java.io.BufferedReader;
 import java.io.InputStream;
@@ -37,6 +42,8 @@ public class ReadingActivity extends AppCompatActivity {
 
         setContentView(R.layout.reading_activity);
 
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+
         Bundle extras = getIntent().getExtras();
 
         chapterUrls = extras.getStringArray("chapterUrls");
@@ -47,14 +54,42 @@ public class ReadingActivity extends AppCompatActivity {
         imageLoader = new LoadImage(chapterUrls[chapterNumber]);
         imageLoader.execute();
 
+        Button previousChapter = findViewById(R.id.previous_chapter_button);
+        previousChapter.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (chapterNumber > 0) {
+                    chapterNumber--;
+                    findViewById(R.id.recycle_view).setVisibility(View.INVISIBLE);
+                    findViewById(R.id.progressBar).setVisibility(View.VISIBLE);
+
+                    imageLoader.cancel(true);
+                    imageLoader = new LoadImage(chapterUrls[chapterNumber]);
+                    imageLoader.execute();
+                }
+            }
+        });
+
+
+        Button nextChapter = findViewById(R.id.next_chapter_button);
+        nextChapter.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (chapterNumber < chapterUrls.length - 1) {
+                    chapterNumber++;
+                    imageLoader.cancel(true);
+
+                    findViewById(R.id.recycle_view).setVisibility(View.INVISIBLE);
+                    findViewById(R.id.progressBar).setVisibility(View.VISIBLE);
+                    imageLoader = new LoadImage(chapterUrls[chapterNumber]);
+                    imageLoader.execute();
+                }
+            }
+        });
+
 
     }
 
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.main_menu, menu);
-        return true;
-    }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -63,7 +98,7 @@ public class ReadingActivity extends AppCompatActivity {
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        //TODO: Change this to a more robust system
+
         if (id == R.id.previous) {
             if (chapterNumber > 0) {
                 chapterNumber--;
@@ -78,13 +113,16 @@ public class ReadingActivity extends AppCompatActivity {
         }
         if (id == R.id.next)
         {
-            chapterNumber++;
-            imageLoader.cancel(true);
+            if (chapterNumber < chapterUrls.length - 1) {
+                chapterNumber++;
+                imageLoader.cancel(true);
 
-            findViewById(R.id.recycle_view).setVisibility(View.GONE);
-            findViewById(R.id.progressBar).setVisibility(View.VISIBLE);
-            imageLoader = new LoadImage(chapterUrls[chapterNumber]);
-            imageLoader.execute();
+                findViewById(R.id.recycle_view).setVisibility(View.GONE);
+                findViewById(R.id.progressBar).setVisibility(View.VISIBLE);
+                imageLoader = new LoadImage(chapterUrls[chapterNumber]);
+                imageLoader.execute();
+            }
+
             return true;
         }
         if (id == R.id.changeChapter)
@@ -98,14 +136,19 @@ public class ReadingActivity extends AppCompatActivity {
                     String chapter = text.getText().toString();
 
                     chapterNumber = Integer.parseInt(chapter);
-                    imageLoader.cancel(true);
 
-                    findViewById(R.id.recycle_view).setVisibility(View.GONE);
-                    findViewById(R.id.progressBar).setVisibility(View.VISIBLE);
-                    imageLoader = new LoadImage(chapterUrls[Integer.parseInt(chapter)]);
-                    imageLoader.execute();
+                    if (chapterNumber < chapterUrls.length - 1) {
+                        imageLoader.cancel(true);
 
-                    dialog.dismiss();
+                        findViewById(R.id.recycle_view).setVisibility(View.GONE);
+                        findViewById(R.id.progressBar).setVisibility(View.VISIBLE);
+                        imageLoader = new LoadImage(chapterUrls[Integer.parseInt(chapter)]);
+                        imageLoader.execute();
+                        dialog.dismiss();
+                    } else {
+                        Toast.makeText(getApplicationContext(),"Invalid Chapter",Toast.LENGTH_SHORT).show();
+                    }
+
                 }
             });
 

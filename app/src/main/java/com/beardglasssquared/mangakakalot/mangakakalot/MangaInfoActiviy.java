@@ -40,9 +40,9 @@ public class MangaInfoActiviy extends AppCompatActivity {
 
         Picasso.with(getApplicationContext()).load(imgurl).into(mangaCover);
 
-        Toolbar toolbar = (Toolbar)findViewById(R.id.toolbar);
-
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
         toolbar.setTitleTextColor(Color.parseColor("#ffffff"));
         if (getSupportActionBar() != null)
         {

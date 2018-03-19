@@ -13,23 +13,23 @@
         android:theme="@style/AppTheme">
         <activity
             android:name=".ReadingActivity"
-
-            >
+            android:theme="@style/AppTheme.NoActionBar" >
             <intent-filter>
-
                 <action android:name="android.intent.action.MAIN" />
             </intent-filter>
         </activity>
         <activity android:name=".MangaBrowserActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".MangaInfoActiviy"
-            android:theme="@style/AppTheme.NoActionBar"
-            >
+
+        <activity
+            android:name=".MangaInfoActiviy"
+            android:theme="@style/AppTheme.NoActionBar" >
+
+
         </activity>
     </application>
 

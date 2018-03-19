@@ -6,6 +6,54 @@
     android:layout_height="match_parent"
     tools:context="com.beardglasssquared.mangakakalot.mangakakalot.ReadingActivity">
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <com.beardglasssquared.mangakakalot.mangakakalot.MultiClickRecyclerView
+            android:id="@+id/recycle_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_alignParentStart="true"
+            android:layout_weight="1"
+            tools:layout_editor_absoluteX="8dp"
+            tools:layout_editor_absoluteY="8dp">
+
+        </com.beardglasssquared.mangakakalot.mangakakalot.MultiClickRecyclerView>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/previous_chapter_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Prev"
+                android:textAppearance="@android:style/TextAppearance.Material.Widget.Button" />
+
+            <Button
+                android:id="@+id/more_settings_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="More"
+                android:textAppearance="@android:style/TextAppearance.Material.Widget.Button" />
+
+            <Button
+                android:id="@+id/next_chapter_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Next"
+                android:textAppearance="@android:style/TextAppearance.Material.Widget.Button" />
+        </LinearLayout>
+
+    </LinearLayout>
+
     <ProgressBar
         android:id="@+id/progressBar"
         style="?android:attr/progressBarStyle"
@@ -13,21 +61,4 @@
         android:layout_height="wrap_content"
         android:layout_centerInParent="true" />
 
-    <com.beardglasssquared.mangakakalot.mangakakalot.MultiClickRecyclerView
-        android:id="@+id/recycle_view"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        tools:layout_editor_absoluteX="8dp"
-        tools:layout_editor_absoluteY="8dp">
-
-    </com.beardglasssquared.mangakakalot.mangakakalot.MultiClickRecyclerView>
-
-    <android.support.v7.widget.Toolbar
-        android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        android:layout_alignBottom="@id/recycle_view"
-        android:elevation="@dimen/cardview_default_elevation">
-
-
-    </android.support.v7.widget.Toolbar>
 </RelativeLayout>
