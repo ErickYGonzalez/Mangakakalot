@@ -19,30 +19,30 @@ import java.util.List;
 
 public class MoreInfoAdapter extends RecyclerView.Adapter<MoreInfoAdapter.MoreInfoHolder>{
 
-    List<String> urls;
+    Manga manga;
+    String[] urls;
     Context context;
 
-    public MoreInfoAdapter(List<String> urls, Context context) {
-        this.urls = urls;
+    public MoreInfoAdapter(Manga manga, Context context) {
+        this.manga = manga;
+        urls = manga.chaptersLinks;
         this.context = context;
     }
 
     @Override
     public int getItemCount() {
-        return urls.size();
+        return urls.length;
     }
 
     @Override
     public void onBindViewHolder(MoreInfoAdapter.MoreInfoHolder holder, final int position) {
-        String url = urls.get(position);
+        String url = urls[position];
         holder.tv.setText("Chapter " + url.substring(url.indexOf("chapter_") + "chapter_".length()));
         holder.tv.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(context,ReadingActivity.class);
-                String[] chapterUrls = new String[urls.size()];
-                chapterUrls = urls.toArray(chapterUrls);
-                intent.putExtra("chapterUrls",chapterUrls);
+                intent.putExtra("chapterUrls",urls);
                 intent.putExtra("chapterNumber",position);
                 context.startActivity(intent);
             }

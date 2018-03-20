@@ -21,6 +21,8 @@ public class Manga {
      */
 
     String title;
+    String description;
+    String author;
     String[] chaptersLinks;
 
     public Manga (String title, String[] chaptersLinks)
@@ -28,4 +30,9 @@ public class Manga {
         this.title = title;
         this.chaptersLinks = chaptersLinks;
     }
+
+    public Manga(){
+
+    }
+
 }

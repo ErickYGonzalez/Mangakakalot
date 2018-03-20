@@ -58,7 +58,7 @@ public class MangaBrowserActivity extends AppCompatActivity {
                 findViewById(R.id.recycle_view).setVisibility(View.GONE);
                 findViewById(R.id.progressBar).setVisibility(View.VISIBLE);
 
-                Toast.makeText(getApplicationContext(),"Page: " + String.valueOf(pageNumber), Toast.LENGTH_LONG).show();
+                Toast.makeText(getApplicationContext(),"Page " + String.valueOf(pageNumber), Toast.LENGTH_LONG).show();
 
                 lpp.cancel(true);
                 lpp = new LoadPopularPage(pageNumber);
@@ -72,7 +72,7 @@ public class MangaBrowserActivity extends AppCompatActivity {
             findViewById(R.id.recycle_view).setVisibility(View.GONE);
             findViewById(R.id.progressBar).setVisibility(View.VISIBLE);
 
-            Toast.makeText(getApplicationContext(),"Page: " + String.valueOf(pageNumber), Toast.LENGTH_LONG).show();
+            Toast.makeText(getApplicationContext(),"Page " + String.valueOf(pageNumber), Toast.LENGTH_LONG).show();
 
 
             lpp.cancel(true);

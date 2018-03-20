@@ -20,6 +20,8 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ImageHolder>
     Context context;
     MultiClickRecyclerView rv;
     List<String> urls;
+    int wrap = ViewGroup.LayoutParams.MATCH_PARENT;
+
 
     public ImageAdapter(List<String> urls, Context context, MultiClickRecyclerView rv) {
         this.urls = urls;
@@ -34,9 +36,19 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ImageHolder>
 
     }
 
+    public void switchWidth() {
+        wrap = wrap == ViewGroup.LayoutParams.MATCH_PARENT ? ViewGroup.LayoutParams.MATCH_PARENT : ViewGroup.LayoutParams.WRAP_CONTENT;
+    }
+
+
     @Override
     public void onBindViewHolder(ImageHolder holder, int position) {
         Picasso.with(context).load(urls.get(position)).into(holder.vPhotoView);
+
+
+        holder.vCardView.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, wrap));
+
+
         //this is where I can change the views to act the way I want with "setOn<Event>"
 
         /*
@@ -76,6 +88,7 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ImageHolder>
             super(v);
             vPhotoView = v.findViewById(R.id.photo_view);
             vCardView = v.findViewById(R.id.card_view);
+
         }
     }
 }

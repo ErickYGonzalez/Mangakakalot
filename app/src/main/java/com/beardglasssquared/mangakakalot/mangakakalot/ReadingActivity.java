@@ -369,7 +369,15 @@ public class ReadingActivity extends AppCompatActivity {
             llm.setOrientation(LinearLayoutManager.VERTICAL);
             rv.setLayoutManager(llm);
 
-            ImageAdapter ca = new ImageAdapter(urls, getApplicationContext(), rv);
+            final ImageAdapter ca = new ImageAdapter(urls, getApplicationContext(), rv);
+            Button zoom = findViewById(R.id.zoom_button);
+            zoom.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    ca.switchWidth();
+                }
+            });
+
             rv.setAdapter(ca);
 
             rv.setVisibility(View.VISIBLE);

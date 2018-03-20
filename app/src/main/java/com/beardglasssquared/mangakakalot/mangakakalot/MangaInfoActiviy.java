@@ -1,20 +1,26 @@
 package com.beardglasssquared.mangakakalot.mangakakalot;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.graphics.drawable.BitmapDrawable;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
+import com.transitionseverywhere.TransitionManager;
 
 import java.io.BufferedReader;
 import java.io.InputStream;
@@ -24,28 +30,48 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
+import jp.wasabeef.blurry.Blurry;
+
 public class MangaInfoActiviy extends AppCompatActivity {
+
+    String name, imgurl, mangaUrl;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.manga_info_activity);
 
-        ImageView mangaCover = findViewById(R.id.manga_cover);
 
         Bundle extras = getIntent().getExtras();
-        String imgurl = extras.getString("imgurl");
-        String mangaUrl = extras.getString("mangaUrl");
-        String name = extras.getString("name");
+        imgurl = extras.getString("imgurl");
+        mangaUrl = extras.getString("mangaUrl");
+        name = extras.getString("name");
 
+        TextView title = findViewById(R.id.title_text);
+        title.setText(name);
+
+        ImageView mangaCover = findViewById(R.id.manga_cover);
+        ImageView mangaCoverSmall = findViewById(R.id.manga_cover_small);
         Picasso.with(getApplicationContext()).load(imgurl).into(mangaCover);
+        Picasso.with(getApplicationContext()).load(imgurl).into(mangaCoverSmall);
 
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+        mangaCoverSmall.bringToFront();
+        FrameLayout fl = findViewById(R.id.fl);
+        fl.invalidate();
+
+
+        BitmapDrawable drawable = (BitmapDrawable) mangaCover.getDrawable();
+        Bitmap bitmap = drawable.getBitmap();
+
+        Blurry.with(getApplicationContext())
+                .radius(3)
+                .sampling(1)
+                .from(bitmap)
+                .into(mangaCover);
+
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
-
-        toolbar.setTitleTextColor(Color.parseColor("#ffffff"));
+        setTitle(name);
 
         LoadChapters loadChapters = new LoadChapters(mangaUrl);
         loadChapters.execute();
@@ -62,7 +88,7 @@ public class MangaInfoActiviy extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    public class LoadChapters extends AsyncTask<String, Void, List<String>> {
+    public class LoadChapters extends AsyncTask<String, Void, Manga> {
 
         ProgressBar pb;
         RecyclerView rv;
@@ -73,7 +99,10 @@ public class MangaInfoActiviy extends AppCompatActivity {
         }
 
         @Override
-        protected List<String> doInBackground(String... strings) {
+        protected Manga doInBackground(String... strings) {
+
+            Manga manga = new Manga();
+            manga.title = name;
 
             InputStream is;
             List<String> chapterUrls = new ArrayList<>();
@@ -98,6 +127,18 @@ public class MangaInfoActiviy extends AppCompatActivity {
 
                         String inputLine;
                         while ((inputLine = in.readLine()) != null) {
+
+                            if(inputLine.contains("Author(s) :")){
+                                inputLine = in.readLine();
+                                manga.author = inputLine.substring(inputLine.indexOf(">")+ 1, inputLine.indexOf("</a>"));
+                            }
+                            if(inputLine.contains("noidungm"))
+                            {
+                                inputLine = in.readLine();
+                                inputLine = in.readLine();
+                                manga.description = inputLine;
+                            }
+
                             if (inputLine.contains("chapter-list")) {
                                 while (!inputLine.contains("comment-info")) {
                                     inputLine = in.readLine();
@@ -124,25 +165,39 @@ public class MangaInfoActiviy extends AppCompatActivity {
             {
                 reverse.add(chapterUrls.get(chapterUrls.size() - i - 1));
             }
-            return reverse;
+
+            String[] c = new String[reverse.size()];
+            c = reverse.toArray(c);
+
+            manga.chaptersLinks = c;
+            return manga;
         }
 
 
-        protected void onPostExecute(List<String> urls) {
-
+        protected void onPostExecute(final Manga m) {
             pb = findViewById(R.id.progressBar);
             rv = findViewById(R.id.more_info_rv);
-
 
             LinearLayoutManager llm = new LinearLayoutManager(getApplicationContext());
             llm.setOrientation(LinearLayoutManager.VERTICAL);
             rv.setLayoutManager(llm);
 
-            MoreInfoAdapter browserAdapter = new MoreInfoAdapter(urls,getApplicationContext());
+
+            MoreInfoAdapter browserAdapter = new MoreInfoAdapter(m,getApplicationContext());
             rv.setAdapter(browserAdapter);
 
+            rv.setNestedScrollingEnabled(false);
             rv.setVisibility(View.VISIBLE);
             pb.setVisibility(View.GONE);
+
+            final CardView card = findViewById(R.id.card_view);
+            final TextView description = findViewById(R.id.discriptions_text);
+            TextView author = findViewById(R.id.author_text);
+
+            TransitionManager.beginDelayedTransition(card);
+            author.setText(m.author);
+            description.setText("\n" + m.description);
+
         }
     }
 }
