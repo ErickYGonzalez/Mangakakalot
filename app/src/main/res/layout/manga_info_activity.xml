@@ -114,10 +114,11 @@
 
                 <ImageView
                     android:id="@+id/manga_cover_small"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_width="75dp"
+                    android:layout_height="100dp"
                     android:layout_gravity="right"
-                    android:layout_marginRight="50dp"
+                    android:layout_marginRight="40dp"
+                    android:adjustViewBounds="true"
                     android:background="#ffffff"
                     android:contentDescription="@null"
                     android:elevation="10dp"
