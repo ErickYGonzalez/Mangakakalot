@@ -122,7 +122,8 @@
                     android:background="#ffffff"
                     android:contentDescription="@null"
                     android:elevation="10dp"
-                    android:padding="2dp" />
+                    android:padding="2dp"
+                    android:scaleType="fitXY" />
             </FrameLayout>
 
             <android.support.v7.widget.RecyclerView
