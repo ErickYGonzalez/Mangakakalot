@@ -1,5 +1,9 @@
 package com.beardglasssquared.mangakakalot.mangakakalot;
 
+import android.annotation.SuppressLint;
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.support.v4.view.MotionEventCompat;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
@@ -24,16 +28,18 @@ public class ZoomedScroll implements View.OnTouchListener {
     private PhotoView photoView;
     private RecyclerView recyclerView;
     private int position;
-
+    private float zoomAmount;
+    private Context context;
     private boolean isLongPressed = false, isDown = true;
 
 
-    public ZoomedScroll(PhotoView photoView, RecyclerView recyclerView, int position)
+    public ZoomedScroll(PhotoView photoView, RecyclerView recyclerView, Context context, int position)
     {
         super();
         this.photoView = photoView;
         this.recyclerView = recyclerView;
         this.position = position;
+        this.context = context;
     }
 
 
@@ -63,6 +69,7 @@ public class ZoomedScroll implements View.OnTouchListener {
                 yTouch = ev.getY();
 
                 final Runnable r = new Runnable() {
+                    @SuppressLint("ResourceType")
                     public void run() {
                         if (isDown)
                         {
@@ -71,7 +78,12 @@ public class ZoomedScroll implements View.OnTouchListener {
 
                             //recyclerView.smoothScrollToPosition(position);
                             photoView.setZoomTransitionDuration(100);
-                            photoView.setScale(1.5f,getXProjection(xTouch,width) ,getYProjection(yTouch,height),true);
+
+                            SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
+                            int pos = sharedPref.getInt(context.getString(R.string.zoom_amount),1);
+                            zoomAmount = 1.25f + 0.25f * pos;
+
+                            photoView.setScale(zoomAmount,getXProjection(xTouch,width) ,getYProjection(yTouch,height),true);
                             isLongPressed = true;
                         }
                     }
@@ -98,7 +110,7 @@ public class ZoomedScroll implements View.OnTouchListener {
                     recyclerView.scrollToPosition(position);
 
                     //Disables Scrollview
-                    photoView.setScale(1.5f, getXProjection(xTouch,width), getYProjection(yTouch,height),false);
+                    photoView.setScale(zoomAmount, getXProjection(xTouch,width), getYProjection(yTouch,height),false);
                     recyclerView.stopScroll();
 
                 }

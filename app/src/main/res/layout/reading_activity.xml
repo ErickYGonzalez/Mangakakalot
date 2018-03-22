@@ -106,7 +106,7 @@
                     tools:text="Zoom" />
 
                 <SeekBar
-                    android:id="@+id/seekBar"
+                    android:id="@+id/zoom_seekBar"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:layout_weight="1"

@@ -4,8 +4,10 @@ import android.app.Application;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.AsyncTask;
+import android.preference.PreferenceManager;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.BottomSheetDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -23,11 +25,14 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 
 import com.transitionseverywhere.TransitionManager;
+
+import org.w3c.dom.Text;
 
 import java.io.BufferedReader;
 import java.io.InputStream;
@@ -43,6 +48,7 @@ public class ReadingActivity extends AppCompatActivity {
     LoadImage imageLoader;
     String[] chapterUrls;
     boolean isBottomExpanded = false;
+    String name;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -56,7 +62,7 @@ public class ReadingActivity extends AppCompatActivity {
         Bundle extras = getIntent().getExtras();
         chapterUrls = extras.getStringArray("chapterUrls");
         chapterNumber = extras.getInt("chapterNumber");
-
+        name = extras.getString("name");
 
         //Pulls the urls for manga images
         imageLoader = new LoadImage(chapterUrls[chapterNumber]);
@@ -71,6 +77,12 @@ public class ReadingActivity extends AppCompatActivity {
 
 
     }
+
+    public String getChapterName(int i)
+    {
+        return chapterUrls[i].substring(chapterUrls[i].indexOf("chapter_") + "chapter_".length());
+    }
+
 
     public void initBottomButtons(){
         //Set backToInfoButton to return to previous activity
@@ -92,7 +104,7 @@ public class ReadingActivity extends AppCompatActivity {
             public void onClick(View view) {
                 if (chapterNumber > 0) {
                     chapterNumber--;
-                    String s = "Current Chapter: " + String.valueOf(chapterNumber);
+                    String s = "Current Chapter: " + getChapterName(chapterNumber);
                     currentChapterText.setText(s);
 
                     Toast.makeText(getApplicationContext(),s, Toast.LENGTH_LONG).show();
@@ -115,7 +127,7 @@ public class ReadingActivity extends AppCompatActivity {
 
                 if (chapterNumber < chapterUrls.length - 1) {
                     chapterNumber++;
-                    String s = "Current Chapter: " + String.valueOf(chapterNumber);
+                    String s = "Current Chapter: " + getChapterName(chapterNumber);
                     currentChapterText.setText(s);
 
                     Toast.makeText(getApplicationContext(),s, Toast.LENGTH_LONG).show();
@@ -148,7 +160,7 @@ public class ReadingActivity extends AppCompatActivity {
                         String chapter = text.getText().toString();
 
                         chapterNumber = Integer.parseInt(chapter);
-                        String s = "Current Chapter: " + String.valueOf(chapterNumber);
+                        String s = "Current Chapter: " + getChapterName(chapterNumber);
                         currentChapterText.setText(s);
 
                         if (chapterNumber <= chapterUrls.length - 1) {
@@ -193,7 +205,7 @@ public class ReadingActivity extends AppCompatActivity {
                     TransitionManager.beginDelayedTransition(bottomSheetLayout);
                     moreSettings.setText("Less");
 
-                    String s = "Current Chapter: " + String.valueOf(chapterNumber);
+                    String s = "Current Chapter: " + getChapterName(chapterNumber);
                     currentChapterText.setText(s);
 
                     chapterSelectLayout.setVisibility(View.VISIBLE);
@@ -229,6 +241,7 @@ public class ReadingActivity extends AppCompatActivity {
         if (id == R.id.previous) {
             if (chapterNumber > 0) {
                 chapterNumber--;
+
                 findViewById(R.id.recycle_view).setVisibility(View.GONE);
                 findViewById(R.id.progressBar).setVisibility(View.VISIBLE);
 
@@ -246,6 +259,9 @@ public class ReadingActivity extends AppCompatActivity {
 
                 findViewById(R.id.recycle_view).setVisibility(View.GONE);
                 findViewById(R.id.progressBar).setVisibility(View.VISIBLE);
+
+                //bookmark progress
+
                 imageLoader = new LoadImage(chapterUrls[chapterNumber]);
                 imageLoader.execute();
             }
@@ -370,18 +386,57 @@ public class ReadingActivity extends AppCompatActivity {
             rv.setLayoutManager(llm);
 
             final ImageAdapter ca = new ImageAdapter(urls, getApplicationContext(), rv);
-            Button zoom = findViewById(R.id.zoom_button);
-            zoom.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    ca.switchWidth();
-                }
-            });
+
+            setUpZoomBar();
+            saveBookmark();
+
+
 
             rv.setAdapter(ca);
 
             rv.setVisibility(View.VISIBLE);
             pb.setVisibility(View.GONE);
         }
+
+        public void saveBookmark()
+        {
+            SharedPreferences sharedPref = getApplicationContext().getSharedPreferences("bookmarks",
+                    Context.MODE_PRIVATE);
+            SharedPreferences.Editor editor = sharedPref.edit();
+            editor.putInt(name,chapterNumber);
+            editor.commit();
+        }
+        public void setUpZoomBar()
+        {
+            SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+            final SharedPreferences.Editor editor = sharedPref.edit();
+
+            final TextView zoomAmountText = findViewById(R.id.zoom_amount_text);
+            SeekBar zoomSeekBar = findViewById(R.id.zoom_seekBar);
+
+            int pos = sharedPref.getInt(getApplicationContext().getString(R.string.zoom_amount),1);
+            zoomAmountText.setText(String.valueOf(1.25f + 0.25f * pos));
+            zoomSeekBar.setProgress(pos);
+
+            zoomSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+                @Override
+                public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+                    editor.putInt(getString(R.string.zoom_amount), i);
+                    zoomAmountText.setText(String.valueOf(1.25f + 0.25f * i));
+                    editor.commit();
+                }
+
+                @Override
+                public void onStartTrackingTouch(SeekBar seekBar) {
+
+                }
+
+                @Override
+                public void onStopTrackingTouch(SeekBar seekBar) {
+
+                }
+            });
+        }
+
     }
 }

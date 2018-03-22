@@ -32,7 +32,6 @@ public class BrowserAdapter extends RecyclerView.Adapter<BrowserAdapter.BrowserH
     @Override
     public int getItemCount() {
         return urls.size()/2;
-
     }
 
     @Override

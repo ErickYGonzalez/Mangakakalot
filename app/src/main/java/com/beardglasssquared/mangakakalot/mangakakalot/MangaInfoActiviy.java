@@ -1,18 +1,21 @@
 package com.beardglasssquared.mangakakalot.mangakakalot;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
-import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.AsyncTask;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
+import android.text.Html;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
@@ -35,6 +38,7 @@ import jp.wasabeef.blurry.Blurry;
 public class MangaInfoActiviy extends AppCompatActivity {
 
     String name, imgurl, mangaUrl;
+    Manga finishedManga;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,6 +79,45 @@ public class MangaInfoActiviy extends AppCompatActivity {
 
         LoadChapters loadChapters = new LoadChapters(mangaUrl);
         loadChapters.execute();
+    }
+
+    public Manga getManga()
+    {
+        return finishedManga;
+    }
+
+
+    @Override
+    public void onResume()
+    {
+        super.onResume();
+
+        if (getManga() != null) {
+
+            SharedPreferences sharedPref = getApplicationContext().getSharedPreferences("bookmarks",
+                    Context.MODE_PRIVATE);
+            final int lastVisitedChapter = sharedPref.getInt(getManga().title,-1);
+            if (lastVisitedChapter > -1) {
+                Button lastVisitedButton = findViewById(R.id.last_visited_button);
+                lastVisitedButton.setVisibility(View.VISIBLE);
+                String url = getManga().chaptersLinks[lastVisitedChapter];
+                String chapterName = "Chapter " + url.substring(url.indexOf("chapter_") + "chapter_".length());
+                lastVisitedButton.setText("Continue to " + chapterName);
+                lastVisitedButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        Intent intent = new Intent(getApplicationContext(),ReadingActivity.class);
+                        intent.putExtra("chapterUrls",getManga().chaptersLinks);
+                        intent.putExtra("chapterNumber",lastVisitedChapter);
+                        intent.putExtra("name",getManga().title);
+
+                        getApplicationContext().startActivity(intent);
+                    }
+                });
+            }
+        }
+
+
     }
 
     @Override
@@ -170,6 +213,7 @@ public class MangaInfoActiviy extends AppCompatActivity {
             c = reverse.toArray(c);
 
             manga.chaptersLinks = c;
+            manga.title = name;
             return manga;
         }
 
@@ -182,8 +226,9 @@ public class MangaInfoActiviy extends AppCompatActivity {
             llm.setOrientation(LinearLayoutManager.VERTICAL);
             rv.setLayoutManager(llm);
 
+            finishedManga = m;
 
-            MoreInfoAdapter browserAdapter = new MoreInfoAdapter(m,getApplicationContext());
+            MangaInfoAdapter browserAdapter = new MangaInfoAdapter(m,getApplicationContext());
             rv.setAdapter(browserAdapter);
 
             rv.setNestedScrollingEnabled(false);
@@ -196,8 +241,29 @@ public class MangaInfoActiviy extends AppCompatActivity {
 
             TransitionManager.beginDelayedTransition(card);
             author.setText(m.author);
-            description.setText("\n" + m.description);
+            description.setText("\n" + Html.fromHtml(m.description));
 
+            SharedPreferences sharedPref = getApplicationContext().getSharedPreferences("bookmarks",
+                    Context.MODE_PRIVATE);
+            final int lastVisitedChapter = sharedPref.getInt(m.title,-1);
+            if (lastVisitedChapter > -1) {
+                Button lastVisitedButton = findViewById(R.id.last_visited_button);
+                lastVisitedButton.setVisibility(View.VISIBLE);
+                String url = m.chaptersLinks[lastVisitedChapter];
+                String chapterName = "Chapter " + url.substring(url.indexOf("chapter_") + "chapter_".length());
+                lastVisitedButton.setText("Continue to " + chapterName);
+                lastVisitedButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        Intent intent = new Intent(getApplicationContext(),ReadingActivity.class);
+                        intent.putExtra("chapterUrls",m.chaptersLinks);
+                        intent.putExtra("chapterNumber",lastVisitedChapter);
+                        intent.putExtra("name",m.title);
+
+                        getApplicationContext().startActivity(intent);
+                    }
+                });
+            }
         }
     }
 }

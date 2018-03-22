@@ -45,29 +45,11 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ImageHolder>
     public void onBindViewHolder(ImageHolder holder, int position) {
         Picasso.with(context).load(urls.get(position)).into(holder.vPhotoView);
 
+        //TODO: Set a boolean settings value for this
+        //Use a shared preference for this
 
-        holder.vCardView.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, wrap));
 
-
-        //this is where I can change the views to act the way I want with "setOn<Event>"
-
-        /*
-        holder.vPhotoView.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View view) {
-                rv.smoothScrollToPosition(p);
-
-                if (pv.getScale() != 1.0f) {
-                    pv.setZoomTransitionDuration(50);
-                    pv.setScale(1.0f,true);
-                } else {
-
-                }
-                return true;
-            }
-        });*/
-
-        holder.vPhotoView.setOnTouchListener(new ZoomedScroll(holder.vPhotoView,rv,position));
+        holder.vPhotoView.setOnTouchListener(new ZoomedScroll(holder.vPhotoView,rv,context,position));
 
 
     }
