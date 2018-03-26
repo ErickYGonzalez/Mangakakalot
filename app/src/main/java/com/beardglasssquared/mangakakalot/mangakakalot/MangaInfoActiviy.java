@@ -4,9 +4,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.AsyncTask;
 import android.preference.PreferenceManager;
+import android.provider.ContactsContract;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.CardView;
@@ -54,24 +56,15 @@ public class MangaInfoActiviy extends AppCompatActivity {
         TextView title = findViewById(R.id.title_text);
         title.setText(name);
 
-        ImageView mangaCover = findViewById(R.id.manga_cover);
         ImageView mangaCoverSmall = findViewById(R.id.manga_cover_small);
-        Picasso.with(getApplicationContext()).load(imgurl).into(mangaCover);
-        Picasso.with(getApplicationContext()).load(imgurl).into(mangaCoverSmall);
 
         mangaCoverSmall.bringToFront();
         FrameLayout fl = findViewById(R.id.fl);
         fl.invalidate();
 
+        LoadBackgroundImages loadBackgroundImages = new LoadBackgroundImages(mangaUrl);
+        loadBackgroundImages.execute();
 
-        BitmapDrawable drawable = (BitmapDrawable) mangaCover.getDrawable();
-        Bitmap bitmap = drawable.getBitmap();
-
-        Blurry.with(getApplicationContext())
-                .radius(3)
-                .sampling(1)
-                .from(bitmap)
-                .into(mangaCover);
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
@@ -228,20 +221,19 @@ public class MangaInfoActiviy extends AppCompatActivity {
 
             finishedManga = m;
 
-            MangaInfoAdapter browserAdapter = new MangaInfoAdapter(m,getApplicationContext());
-            rv.setAdapter(browserAdapter);
-
-            rv.setNestedScrollingEnabled(false);
-            rv.setVisibility(View.VISIBLE);
-            pb.setVisibility(View.GONE);
-
             final CardView card = findViewById(R.id.card_view);
             final TextView description = findViewById(R.id.discriptions_text);
             TextView author = findViewById(R.id.author_text);
 
+            MangaInfoAdapter browserAdapter = new MangaInfoAdapter(m,getApplicationContext());
+            rv.setNestedScrollingEnabled(false);
+            rv.setAdapter(browserAdapter);
+
             TransitionManager.beginDelayedTransition(card);
             author.setText(m.author);
             description.setText("\n" + Html.fromHtml(m.description));
+            pb.setVisibility(View.GONE);
+
 
             SharedPreferences sharedPref = getApplicationContext().getSharedPreferences("bookmarks",
                     Context.MODE_PRIVATE);
@@ -264,6 +256,100 @@ public class MangaInfoActiviy extends AppCompatActivity {
                     }
                 });
             }
+            rv.setVisibility(View.VISIBLE);
         }
+    }
+
+    public void setBackground(Bitmap bitmap)
+    {
+        ImageView mangaCover = findViewById(R.id.manga_cover);
+        ImageView mangaCoverSmall = findViewById(R.id.manga_cover_small);
+        //mangaCover.setImageBitmap(bitmap);
+        Blurry.with(getApplicationContext())
+                .radius(3)
+                .sampling(1)
+                .from(bitmap)
+                .into(mangaCover);
+        mangaCoverSmall.setImageBitmap(bitmap);
+
+        mangaCoverSmall.bringToFront();
+        FrameLayout fl = findViewById(R.id.fl);
+        fl.invalidate();
+
+
+    }
+    public class LoadBackgroundImages extends AsyncTask<String, Void, Bitmap> {
+
+        ProgressBar pb;
+        RecyclerView rv;
+        String mangaUrl;
+
+        public LoadBackgroundImages(String mangaUrl) {
+            this.mangaUrl = mangaUrl;
+        }
+
+        @Override
+        protected Bitmap doInBackground(String... strings) {
+            String mangaCoverUrl = "";
+            InputStream is;
+            ;
+
+            Bitmap bitmap = null;
+
+            try {
+                //This is where the input box and number picker changes the manga
+                //String rootUrl = "http://mangakakalot.com/chapter/";
+                URL url = new URL(mangaUrl);
+
+                HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+                if (connection instanceof HttpURLConnection) {
+                    HttpURLConnection httpURLConnection = (HttpURLConnection) connection;
+                    int response = -1;
+                    httpURLConnection.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.95 Safari/537.11");
+                    httpURLConnection.connect();
+                    response = httpURLConnection.getResponseCode();
+
+                    if (response == HttpURLConnection.HTTP_OK) {
+                        is = httpURLConnection.getInputStream();
+                        BufferedReader in = new BufferedReader(new InputStreamReader(is));
+
+                        String inputLine;
+                        while ((inputLine = in.readLine()) != null) {
+                            if (inputLine.contains("manga-info-pic")) {
+                                inputLine = in.readLine();
+                                mangaCoverUrl = inputLine.substring(inputLine.indexOf("http"),inputLine.indexOf(".jpg") + ".jpg".length());
+
+                                imgurl = mangaCoverUrl;
+                            }
+                        }
+                    }
+
+
+                    InputStream iStream = null;
+                    URL u = new URL(mangaCoverUrl);
+                    HttpURLConnection conn = (HttpURLConnection) u.openConnection();
+                    conn.setReadTimeout(5000 /* milliseconds */);
+                    conn.setConnectTimeout(7000 /* milliseconds */);
+                    conn.setRequestMethod("GET");
+                    conn.setDoInput(true);
+                    conn.connect();
+                    iStream = conn.getInputStream();
+                    bitmap = BitmapFactory.decodeStream(iStream);
+                }
+            } catch (Exception e) {
+                Toast.makeText(getApplicationContext(), "Unable to load ", Toast.LENGTH_LONG).show();
+
+                e.printStackTrace();
+            }
+
+
+            return bitmap;
+        }
+
+        @Override
+        protected void onPostExecute(Bitmap b) {
+            setBackground(b);
+        }
+
     }
 }

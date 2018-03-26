@@ -37,6 +37,7 @@ public class ZoomedScroll implements View.OnTouchListener {
     {
         super();
         this.photoView = photoView;
+        photoView.setMaximumScale(10f);
         this.recyclerView = recyclerView;
         this.position = position;
         this.context = context;

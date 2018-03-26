@@ -1,21 +1,22 @@
 package com.beardglasssquared.mangakakalot.mangakakalot;
 
-import android.app.Dialog;
+import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.EditText;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.ProgressBar;
+import android.widget.SearchView;
 import android.widget.Toast;
-import android.widget.Toolbar;
 
 import java.io.BufferedReader;
 import java.io.InputStream;
@@ -25,81 +26,84 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MangaBrowserActivity extends AppCompatActivity {
+public class SearchActivity extends AppCompatActivity {
 
-    int pageNumber = 1;
-    LoadPopularPage lpp;
+
+    GetSearch search;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.browser_activity);
+        setContentView(R.layout.activity_search);
 
-        lpp = new LoadPopularPage(pageNumber);
-        lpp.execute();
-    }
+        Bundle extras = getIntent().getExtras();
+        String searchTerm = extras.getString("search_term");
+        setTitle(searchTerm);
 
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.main_menu, menu);
-        return true;
+
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
+
+        search = new GetSearch(searchTerm);
+        search.execute(searchTerm);
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        MenuItem item = menu.getItem(0);
+        final SearchView searchView = (SearchView)
+                MenuItemCompat.getActionView(item);
 
-        //TODO: Change this to a more robust system
-        if (id == R.id.previous) {
-            if (pageNumber > 1) {
-                pageNumber--;
+        searchView.setOnQueryTextFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(final View view, boolean hasFocus) {
+                if (hasFocus) {
+                    view.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            InputMethodManager imm = (InputMethodManager) getApplicationContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+                            imm.showSoftInput(view.findFocus(), 0);
+                        }
+                    }, 200);
+                }
+            }
+        });
+
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String s) {
                 findViewById(R.id.recycle_view).setVisibility(View.GONE);
                 findViewById(R.id.progressBar).setVisibility(View.VISIBLE);
 
-                Toast.makeText(getApplicationContext(),"Page " + String.valueOf(pageNumber), Toast.LENGTH_LONG).show();
+                search.cancel(true);
+                search = new GetSearch(s);
+                search.execute();
 
-                lpp.cancel(true);
-                lpp = new LoadPopularPage(pageNumber);
-                lpp.execute();
+                return true;
             }
-            return true;
-        }
-        if (id == R.id.next)
-        {
-            pageNumber++;
-            findViewById(R.id.recycle_view).setVisibility(View.GONE);
-            findViewById(R.id.progressBar).setVisibility(View.VISIBLE);
 
-            Toast.makeText(getApplicationContext(),"Page " + String.valueOf(pageNumber), Toast.LENGTH_LONG).show();
-
-
-            lpp.cancel(true);
-            lpp = new LoadPopularPage(pageNumber);
-            lpp.execute();
-            return true;
-        }
-        if (id == R.id.changeChapter)
-        {
-            Intent intent = new Intent(this,MainActivity.class);
-            startActivity(intent);
-        }
-
-        return super.onOptionsItemSelected(item);
+            @Override
+            public boolean onQueryTextChange(String s) {
+                return false;
+            }
+        });
+        return true;
     }
 
+    public class GetSearch extends AsyncTask<String, Void, List<MangaLink>> {
 
-    public class LoadPopularPage extends AsyncTask<String, Void, List<MangaLink>> {
-
-        int pageNumber;
         ProgressBar pb;
         RecyclerView rv;
+        String searchTerm;
 
-        public LoadPopularPage(int pageNumber)
+        public GetSearch(String s)
         {
-            this.pageNumber = pageNumber;
+            searchTerm = s;
+            if (searchTerm.contains(" ")) {
+                searchTerm = searchTerm.replace(" ","_");
+            }
         }
 
         @Override
@@ -110,7 +114,8 @@ public class MangaBrowserActivity extends AppCompatActivity {
             try {
                 //This is where the input box and number picker changes the manga
                 //String rootUrl = "http://mangakakalot.com/chapter/";
-                String rootUrl = "http://mangakakalot.com/manga_list?type=topview&category=all&state=all&page=" + Integer.toString(pageNumber);
+                String rootUrl = "http://mangakakalot.com/search/" + searchTerm;
+
                 URL url = new URL(rootUrl);
 
 
@@ -132,17 +137,15 @@ public class MangaBrowserActivity extends AppCompatActivity {
                         //Where reading from html code starts
                         String inputLine;
                         while ((inputLine = in.readLine()) != null) {
-                            if (inputLine.contains("list-truyen-item-wrap")) {
+                            if (inputLine.contains("item-name"))
+                            {
                                 inputLine = in.readLine();
-                                String title = inputLine.substring(inputLine.indexOf("title=") + 7, inputLine.length() - 2);
-                                String mangaUrl = inputLine.substring(inputLine.indexOf("http:"), inputLine.indexOf("title=") - 2);
 
-                                //contains the image url for the manga
-                                inputLine = in.readLine();
-                                String imageUrl = inputLine.substring(inputLine.indexOf("http:"), inputLine.indexOf(".jpg") + 4);
+                                String mangaName = inputLine.substring(inputLine.indexOf("\">") + 2, inputLine.indexOf("</a>"));
 
-                                Log.d("Image Url",imageUrl);
-                                MangaLink link = new MangaLink(title,imageUrl,"",mangaUrl);
+                                String mangaUrl = inputLine.substring(inputLine.indexOf("http"),inputLine.indexOf("\">"));
+
+                                MangaLink link = new MangaLink(mangaName,"","",mangaUrl);
                                 mangaLinks.add(link);
                             }
                         }
@@ -158,12 +161,7 @@ public class MangaBrowserActivity extends AppCompatActivity {
 
 
         protected void onPostExecute(List<MangaLink> urls) {
-                /*
-                recList.setHasFixedSize(true);
-                LinearLayoutManager llm = new LinearLayoutManager(context);
-                llm.setOrientation(LinearLayoutManager.VERTICAL);
-                recList.setLayoutManager(llm);
-                */
+
             pb = findViewById(R.id.progressBar);
             rv = findViewById(R.id.recycle_view);
 
@@ -172,11 +170,12 @@ public class MangaBrowserActivity extends AppCompatActivity {
             llm.setOrientation(LinearLayoutManager.VERTICAL);
             rv.setLayoutManager(llm);
 
-            BrowserAdapter browserAdapter = new BrowserAdapter(urls, getApplicationContext());
-            rv.setAdapter(browserAdapter);
+            SearchAdapter searchAdapter = new SearchAdapter(getApplicationContext(),urls);
+            rv.setAdapter(searchAdapter);
 
             rv.setVisibility(View.VISIBLE);
             pb.setVisibility(View.GONE);
         }
     }
+
 }

@@ -1,21 +1,17 @@
 package com.beardglasssquared.mangakakalot.mangakakalot;
 
-import android.app.Dialog;
-import android.content.Intent;
+import android.net.Uri;
 import android.os.AsyncTask;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
+import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.EditText;
+import android.view.ViewGroup;
 import android.widget.ProgressBar;
 import android.widget.Toast;
-import android.widget.Toolbar;
 
 import java.io.BufferedReader;
 import java.io.InputStream;
@@ -25,79 +21,92 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MangaBrowserActivity extends AppCompatActivity {
 
+/**
+ * A simple {@link Fragment} subclass.
+ * Activities that contain this fragment must implement the
+ * {@link NewMangaFragment.OnFragmentInteractionListener} interface
+ * to handle interaction events.
+ * Use the {@link NewMangaFragment#newInstance} factory method to
+ * create an instance of this fragment.
+ */
+public class NewMangaFragment extends Fragment {
+
+    private OnFragmentInteractionListener mListener;
     int pageNumber = 1;
-    LoadPopularPage lpp;
+    LoadNewMangaPage lpp;
+
+    public NewMangaFragment() {
+        // Required empty public constructor
+    }
+
+    /**
+     * Use this factory method to create a new instance of
+     * this fragment using the provided parameters.
+     *
+     * @param param1 Parameter 1.
+     * @param param2 Parameter 2.
+     * @return A new instance of fragment HotMangaFragment.
+     */
+    // TODO: Rename and change types and number of parameters
+    public static NewMangaFragment newInstance() {
+        NewMangaFragment fragment = new NewMangaFragment();
+
+        return fragment;
+    }
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.browser_activity);
 
-        lpp = new LoadPopularPage(pageNumber);
+        lpp = new LoadNewMangaPage(pageNumber);
         lpp.execute();
     }
 
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.main_menu, menu);
-        return true;
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        // Inflate the layout for this fragment
+        return inflater.inflate(R.layout.fragment_hot_manga, container, false);
     }
+
+    // TODO: Rename method, update argument and hook method into UI event
+    public void onButtonPressed(Uri uri) {
+        if (mListener != null) {
+            mListener.onFragmentInteraction(uri);
+        }
+    }
+
+   
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //TODO: Change this to a more robust system
-        if (id == R.id.previous) {
-            if (pageNumber > 1) {
-                pageNumber--;
-                findViewById(R.id.recycle_view).setVisibility(View.GONE);
-                findViewById(R.id.progressBar).setVisibility(View.VISIBLE);
-
-                Toast.makeText(getApplicationContext(),"Page " + String.valueOf(pageNumber), Toast.LENGTH_LONG).show();
-
-                lpp.cancel(true);
-                lpp = new LoadPopularPage(pageNumber);
-                lpp.execute();
-            }
-            return true;
-        }
-        if (id == R.id.next)
-        {
-            pageNumber++;
-            findViewById(R.id.recycle_view).setVisibility(View.GONE);
-            findViewById(R.id.progressBar).setVisibility(View.VISIBLE);
-
-            Toast.makeText(getApplicationContext(),"Page " + String.valueOf(pageNumber), Toast.LENGTH_LONG).show();
-
-
-            lpp.cancel(true);
-            lpp = new LoadPopularPage(pageNumber);
-            lpp.execute();
-            return true;
-        }
-        if (id == R.id.changeChapter)
-        {
-            Intent intent = new Intent(this,MainActivity.class);
-            startActivity(intent);
-        }
-
-        return super.onOptionsItemSelected(item);
+    public void onDetach() {
+        super.onDetach();
+        mListener = null;
     }
 
+    /**
+     * This interface must be implemented by activities that contain this
+     * fragment to allow an interaction in this fragment to be communicated
+     * to the activity and potentially other fragments contained in that
+     * activity.
+     * <p>
+     * See the Android Training lesson <a href=
+     * "http://developer.android.com/training/basics/fragments/communicating.html"
+     * >Communicating with Other Fragments</a> for more information.
+     */
+    public interface OnFragmentInteractionListener {
+        // TODO: Update argument type and name
+        void onFragmentInteraction(Uri uri);
+    }
 
-    public class LoadPopularPage extends AsyncTask<String, Void, List<MangaLink>> {
+    public class LoadNewMangaPage extends AsyncTask<String, Void, List<MangaLink>> {
 
         int pageNumber;
         ProgressBar pb;
         RecyclerView rv;
 
-        public LoadPopularPage(int pageNumber)
+        public LoadNewMangaPage(int pageNumber)
         {
             this.pageNumber = pageNumber;
         }
@@ -110,7 +119,7 @@ public class MangaBrowserActivity extends AppCompatActivity {
             try {
                 //This is where the input box and number picker changes the manga
                 //String rootUrl = "http://mangakakalot.com/chapter/";
-                String rootUrl = "http://mangakakalot.com/manga_list?type=topview&category=all&state=all&page=" + Integer.toString(pageNumber);
+                String rootUrl = "http://mangakakalot.com/manga_list?type=latest&category=all&state=all&page=" + Integer.toString(pageNumber);
                 URL url = new URL(rootUrl);
 
 
@@ -149,7 +158,7 @@ public class MangaBrowserActivity extends AppCompatActivity {
                     }
                 }
             } catch (Exception e) {
-                Toast.makeText(getApplicationContext(), "Unable to load ", Toast.LENGTH_LONG).show();
+                Toast.makeText(getContext(), "Unable to load ", Toast.LENGTH_LONG).show();
 
                 e.printStackTrace();
             }
@@ -164,15 +173,15 @@ public class MangaBrowserActivity extends AppCompatActivity {
                 llm.setOrientation(LinearLayoutManager.VERTICAL);
                 recList.setLayoutManager(llm);
                 */
-            pb = findViewById(R.id.progressBar);
-            rv = findViewById(R.id.recycle_view);
+            pb = getView().findViewById(R.id.progressBar);
+            rv = getView().findViewById(R.id.recycle_view);
 
 
-            LinearLayoutManager llm = new LinearLayoutManager(getApplicationContext());
+            LinearLayoutManager llm = new LinearLayoutManager(getContext());
             llm.setOrientation(LinearLayoutManager.VERTICAL);
             rv.setLayoutManager(llm);
 
-            BrowserAdapter browserAdapter = new BrowserAdapter(urls, getApplicationContext());
+            BrowserAdapter browserAdapter = new BrowserAdapter(urls, getContext());
             rv.setAdapter(browserAdapter);
 
             rv.setVisibility(View.VISIBLE);

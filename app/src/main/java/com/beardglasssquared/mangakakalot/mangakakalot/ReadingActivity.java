@@ -412,11 +412,29 @@ public class ReadingActivity extends AppCompatActivity {
             final SharedPreferences.Editor editor = sharedPref.edit();
 
             final TextView zoomAmountText = findViewById(R.id.zoom_amount_text);
-            SeekBar zoomSeekBar = findViewById(R.id.zoom_seekBar);
+            final SeekBar zoomSeekBar = findViewById(R.id.zoom_seekBar);
+            zoomSeekBar.setMax(33);
+
+            final LinearLayout zoomChangerLayout = findViewById(R.id.zoom_changer_layout);
+
+
 
             int pos = sharedPref.getInt(getApplicationContext().getString(R.string.zoom_amount),1);
             zoomAmountText.setText(String.valueOf(1.25f + 0.25f * pos));
             zoomSeekBar.setProgress(pos);
+
+            Button zoomButton = findViewById(R.id.zoom_button);
+            zoomButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    editor.putInt(getString(R.string.zoom_amount), 1);
+                    TransitionManager.beginDelayedTransition(zoomChangerLayout);
+                    zoomSeekBar.setProgress(1);
+                    zoomAmountText.setText(String.valueOf(1.25f + 0.25f * 1));
+                    editor.commit();
+                    Toast.makeText(getApplicationContext(),"Default Zoom: 1.5",Toast.LENGTH_SHORT);
+                }
+            });
 
             zoomSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
                 @Override

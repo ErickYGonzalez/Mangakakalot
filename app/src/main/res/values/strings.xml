@@ -4,4 +4,12 @@
     <string name="action_settings">Settings</string>
     <string name="prev">Prev</string>
     <string name="zoom_amount">Zoom</string>
+    <string name="title_activity_main">Manga</string>
+    <string name="tab_text_1">New</string>
+    <string name="tab_text_2">Hot</string>
+    <string name="tab_text_3">Recent</string>
+    <string name="section_format">Hello World from section: %1$d</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>
