@@ -257,6 +257,8 @@ public class MangaInfoActiviy extends AppCompatActivity {
                 });
             }
             rv.setVisibility(View.VISIBLE);
+
+
         }
     }
 

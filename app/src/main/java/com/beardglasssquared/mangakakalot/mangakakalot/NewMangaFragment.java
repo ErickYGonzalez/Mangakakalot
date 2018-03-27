@@ -150,7 +150,7 @@ public class NewMangaFragment extends Fragment {
                                 inputLine = in.readLine();
                                 String imageUrl = inputLine.substring(inputLine.indexOf("http:"), inputLine.indexOf(".jpg") + 4);
 
-                                Log.d("Image Url",imageUrl);
+                                //Log.d("Image Url",imageUrl);
                                 MangaLink link = new MangaLink(title,imageUrl,"",mangaUrl);
                                 mangaLinks.add(link);
                             }

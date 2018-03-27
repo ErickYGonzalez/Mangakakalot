@@ -2,6 +2,7 @@ package com.beardglasssquared.mangakakalot.mangakakalot;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.support.design.widget.TabLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -25,6 +26,8 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -139,8 +142,21 @@ public class MainActivity extends AppCompatActivity {
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
             View rootView = inflater.inflate(R.layout.fragment_main, container, false);
-            TextView textView = (TextView) rootView.findViewById(R.id.section_label);
-            textView.setText("Coming soon... <_<");
+
+            TextView tv = rootView.findViewById(R.id.section_label);
+            SharedPreferences sharedPref = getContext().getSharedPreferences("bookmarks",
+                    Context.MODE_PRIVATE);
+
+            Map<String,?> keys = sharedPref.getAll();
+
+            String s = "";
+            for(Map.Entry<String,?> entry : keys.entrySet()){
+                s += entry.getKey() + ": " +
+                        entry.getValue().toString() + "\n";
+                Log.d("map values",entry.getKey() + ": " +
+                        entry.getValue().toString());
+            }
+            tv.setText(s);
             return rootView;
         }
     }
@@ -165,6 +181,8 @@ public class MainActivity extends AppCompatActivity {
             if (position == 1) {
                 return HotMangaFragment.newInstance();
             }
+
+
             return PlaceholderFragment.newInstance(position + 1);
         }
 
