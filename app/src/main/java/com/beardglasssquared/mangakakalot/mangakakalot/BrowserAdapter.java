@@ -3,7 +3,9 @@ package com.beardglasssquared.mangakakalot.mangakakalot;
 import android.content.Context;
 import android.content.Intent;
 import android.support.v7.widget.CardView;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,12 +23,50 @@ import java.util.List;
 
 public class BrowserAdapter extends RecyclerView.Adapter<BrowserAdapter.BrowserHolder>{
     Context context;
-    MultiClickRecyclerView rv;
+    RecyclerView rv;
     List<MangaLink> urls;
+    private int lastVisibleItem, totalItemCount;
+    private boolean loading;
+    private OnLoadMoreListener onLoadMoreListener;
+    private int visibleThreshold = 4;
 
-    public BrowserAdapter(List<MangaLink> urls, Context context) {
+    public BrowserAdapter(List<MangaLink> urls, Context context,RecyclerView rv) {
         this.urls = urls;
         this.context = context;
+        if (rv.getLayoutManager() instanceof LinearLayoutManager) {
+
+            final LinearLayoutManager linearLayoutManager = (LinearLayoutManager) rv
+                    .getLayoutManager();
+
+
+            rv.addOnScrollListener(new RecyclerView.OnScrollListener() {
+                @Override
+                public void onScrolled(RecyclerView recyclerView,
+                                       int dx, int dy) {
+                    super.onScrolled(recyclerView, dx, dy);
+
+                    totalItemCount = linearLayoutManager.getItemCount();
+                    lastVisibleItem = linearLayoutManager
+                            .findLastVisibleItemPosition();
+                    if (!loading && totalItemCount <= (lastVisibleItem + visibleThreshold)) {
+                        Log.d("Loading....","Reached Bottom!!!");
+
+                        if (onLoadMoreListener != null) {
+                            onLoadMoreListener.onLoadMore();
+                        }
+                        loading = true;
+                    }
+                }
+            });
+        }
+    }
+
+    public void setOnLoadMoreListener(OnLoadMoreListener onLoadMoreListener) {
+        this.onLoadMoreListener = onLoadMoreListener;
+    }
+
+    public void setLoaded() {
+        loading = false;
     }
 
     @Override
@@ -94,6 +134,7 @@ public class BrowserAdapter extends RecyclerView.Adapter<BrowserAdapter.BrowserH
 
         return new BrowserAdapter.BrowserHolder(itemView);
     }
+
 
     public static class BrowserHolder extends RecyclerView.ViewHolder {
         protected ImageView imageL;

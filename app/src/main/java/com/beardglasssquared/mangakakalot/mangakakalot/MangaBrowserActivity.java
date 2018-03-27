@@ -172,7 +172,7 @@ public class MangaBrowserActivity extends AppCompatActivity {
             llm.setOrientation(LinearLayoutManager.VERTICAL);
             rv.setLayoutManager(llm);
 
-            BrowserAdapter browserAdapter = new BrowserAdapter(urls, getApplicationContext());
+            BrowserAdapter browserAdapter = new BrowserAdapter(urls, getApplicationContext(),rv);
             rv.setAdapter(browserAdapter);
 
             rv.setVisibility(View.VISIBLE);
