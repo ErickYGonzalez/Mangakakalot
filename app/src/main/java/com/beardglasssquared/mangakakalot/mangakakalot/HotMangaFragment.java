@@ -1,6 +1,5 @@
 package com.beardglasssquared.mangakakalot.mangakakalot;
 
-import android.content.Context;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -61,7 +60,7 @@ public class HotMangaFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_hot_manga, container, false);
+        return inflater.inflate(R.layout.fragment_browse_manga, container, false);
     }
 
     // TODO: Rename method, update argument and hook method into UI event

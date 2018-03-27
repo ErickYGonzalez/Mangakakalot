@@ -36,6 +36,7 @@ public class RecentReadFragment extends Fragment {
         super.onCreate(savedInstanceState);
     }
 
+
     TextView tv;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -56,20 +57,27 @@ public class RecentReadFragment extends Fragment {
 
         Map<String,?> keys = sharedPref.getAll();
 
-        String s = "";
-        for(Map.Entry<String,?> entry : keys.entrySet()){
-            s += entry.getKey() + ": " +
-                    entry.getValue().toString() + "\n";
-            Log.d("map values",entry.getKey() + ": " +
-                    entry.getValue().toString());
+        if (keys.size() > 0) {
+            String s = "";
+            for(Map.Entry<String,?> entry : keys.entrySet()){
+                if (!entry.getValue().toString().equals("0")) {
+                    s += entry.getKey() + ": Chapter " +
+                            entry.getValue().toString() + "\n";
+                }
+            }
+            tv.setText(s);
+        } else {
+            tv.setText("No bookmarks found.");
         }
-        tv.setText(s);
+
     }
 
     @Override
     public void onResume() {
         super.onResume();
-
+        if (tv != null) {
+            reloadRecent();
+        }
     }
 
 }

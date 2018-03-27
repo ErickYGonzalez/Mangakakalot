@@ -7,7 +7,7 @@
     <string name="title_activity_main">Manga</string>
     <string name="tab_text_1">New</string>
     <string name="tab_text_2">Hot</string>
-    <string name="tab_text_3">Recent</string>
+    <string name="tab_text_3">Fav</string>
     <string name="section_format">Hello World from section: %1$d</string>
 
     <!-- TODO: Remove or change this placeholder text -->
