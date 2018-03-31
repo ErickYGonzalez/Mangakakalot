@@ -48,7 +48,7 @@ public class ReadingActivity extends AppCompatActivity {
     LoadImage imageLoader;
     String[] chapterUrls;
     boolean isBottomExpanded = false;
-    String name;
+    String name, mangaUrl, imgUrl;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -63,6 +63,9 @@ public class ReadingActivity extends AppCompatActivity {
         chapterUrls = extras.getStringArray("chapterUrls");
         chapterNumber = extras.getInt("chapterNumber");
         name = extras.getString("name");
+        mangaUrl = extras.getString("mangaUrl");
+        imgUrl = extras.getString("imgUrl");
+
 
         //Pulls the urls for manga images
         imageLoader = new LoadImage(chapterUrls[chapterNumber]);
@@ -388,8 +391,7 @@ public class ReadingActivity extends AppCompatActivity {
             final ImageAdapter ca = new ImageAdapter(urls, getApplicationContext(), rv);
 
             setUpZoomBar();
-            saveBookmark();
-
+            saveBookmark(0);
 
 
             rv.setAdapter(ca);
@@ -398,12 +400,41 @@ public class ReadingActivity extends AppCompatActivity {
             pb.setVisibility(View.GONE);
         }
 
-        public void saveBookmark()
+        public void saveBookmark(int page)
         {
             SharedPreferences sharedPref = getApplicationContext().getSharedPreferences("bookmarks",
                     Context.MODE_PRIVATE);
             SharedPreferences.Editor editor = sharedPref.edit();
-            editor.putInt(name,chapterNumber);
+
+            /* Tokens Key
+                    0 - Chapter number (int/index)
+                    1 - Chapter name (string)
+                    2 - page progress (int/index)
+                    3 - Manga Url (String)
+                    4 - Image Url (String)
+                    5 = isFav (bool)
+                 */
+            String time = String.valueOf(System.currentTimeMillis());
+
+            if (rv != null) {
+                editor.putString(name, String.valueOf(chapterNumber) + "," +
+                        getChapterName(chapterNumber) + "," +
+                        String.valueOf(rv.getVerticalScrollbarPosition()) + "," +
+                        mangaUrl    + "," +
+                        imgUrl      + "," +
+                        time        + "," +
+                        "false");
+
+            } else {
+                editor.putString(name,
+                        String.valueOf(chapterNumber) + "," +
+                        getChapterName(chapterNumber) + "," +
+                        "0"         + "," +
+                        mangaUrl    + "," +
+                        imgUrl      + "," +
+                        time        + "," +
+                        "false");
+            }
             editor.commit();
         }
         public void setUpZoomBar()
@@ -432,7 +463,7 @@ public class ReadingActivity extends AppCompatActivity {
                     zoomSeekBar.setProgress(1);
                     zoomAmountText.setText(String.valueOf(1.25f + 0.25f * 1));
                     editor.commit();
-                    Toast.makeText(getApplicationContext(),"Default Zoom: 1.5",Toast.LENGTH_SHORT);
+                    Toast.makeText(getApplicationContext(),"Default Zoom: 1.5",Toast.LENGTH_SHORT).show();
                 }
             });
 

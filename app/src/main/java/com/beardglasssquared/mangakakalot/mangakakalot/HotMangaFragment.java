@@ -23,15 +23,6 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-
-/**
- * A simple {@link Fragment} subclass.
- * Activities that contain this fragment must implement the
- * {@link HotMangaFragment.OnFragmentInteractionListener} interface
- * to handle interaction events.
- * Use the {@link HotMangaFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class HotMangaFragment extends Fragment {
 
     private OnFragmentInteractionListener mListener;
@@ -132,7 +123,7 @@ public class HotMangaFragment extends Fragment {
                                 String imageUrl = inputLine.substring(inputLine.indexOf("http:"), inputLine.indexOf(".jpg") + 4);
 
                                 //Log.d("Image Url",imageUrl);
-                                MangaLink link = new MangaLink(title,imageUrl,"",mangaUrl);
+                                MangaLink link = new MangaLink(title,imageUrl,"",mangaUrl, 0);
                                 mangaLinks.add(link);
                             }
                         }
@@ -163,6 +154,8 @@ public class HotMangaFragment extends Fragment {
             rv.setLayoutManager(llm);
 
             final BrowserAdapter browserAdapter = new BrowserAdapter(urls, getContext(),rv);
+
+            //Loads more data when reaching the bottom of the scroll view
             browserAdapter.setOnLoadMoreListener(new OnLoadMoreListener() {
                 @Override
                 public void onLoadMore() {
@@ -222,7 +215,7 @@ public class HotMangaFragment extends Fragment {
                                                         String imageUrl = inputLine.substring(inputLine.indexOf("http:"), inputLine.indexOf(".jpg") + 4);
 
                                                         //Log.d("Image Url",imageUrl);
-                                                        MangaLink link = new MangaLink(title,imageUrl,"",mangaUrl);
+                                                        MangaLink link = new MangaLink(title,imageUrl,"",mangaUrl, 0);
                                                         mangaLinks.add(link);
                                                     }
                                                 }

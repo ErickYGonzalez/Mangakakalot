@@ -1,6 +1,5 @@
 package com.beardglasssquared.mangakakalot.mangakakalot;
 
-import android.app.Dialog;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
@@ -12,10 +11,8 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.Toast;
-import android.widget.Toolbar;
 
 import java.io.BufferedReader;
 import java.io.InputStream;
@@ -142,7 +139,7 @@ public class MangaBrowserActivity extends AppCompatActivity {
                                 String imageUrl = inputLine.substring(inputLine.indexOf("http:"), inputLine.indexOf(".jpg") + 4);
 
                                 Log.d("Image Url",imageUrl);
-                                MangaLink link = new MangaLink(title,imageUrl,"",mangaUrl);
+                                MangaLink link = new MangaLink(title,imageUrl,"",mangaUrl, 0);
                                 mangaLinks.add(link);
                             }
                         }

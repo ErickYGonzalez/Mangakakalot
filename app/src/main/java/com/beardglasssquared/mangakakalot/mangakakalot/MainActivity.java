@@ -61,6 +61,7 @@ public class MainActivity extends AppCompatActivity {
         mViewPager = (ViewPager) findViewById(R.id.container);
         mViewPager.setAdapter(mSectionsPagerAdapter);
         mViewPager.setOffscreenPageLimit(2);
+        mViewPager.setCurrentItem(1);
 
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
 
@@ -96,6 +97,8 @@ public class MainActivity extends AppCompatActivity {
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String s) {
+                searchView.setQuery("",false);
+                searchView.onActionViewCollapsed();
 
                 Intent intent = new Intent(getApplicationContext(),SearchActivity.class);
                 intent.putExtra("search_term",s);

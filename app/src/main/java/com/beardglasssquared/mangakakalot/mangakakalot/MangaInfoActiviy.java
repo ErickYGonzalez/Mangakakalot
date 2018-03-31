@@ -39,7 +39,7 @@ import jp.wasabeef.blurry.Blurry;
 
 public class MangaInfoActiviy extends AppCompatActivity {
 
-    String name, imgurl, mangaUrl;
+    String name, imgUrl, mangaUrl;
     Manga finishedManga;
 
     @Override
@@ -49,26 +49,26 @@ public class MangaInfoActiviy extends AppCompatActivity {
 
 
         Bundle extras = getIntent().getExtras();
-        imgurl = extras.getString("imgurl");
+        imgUrl = extras.getString("imgurl");
         mangaUrl = extras.getString("mangaUrl");
         name = extras.getString("name");
 
         TextView title = findViewById(R.id.title_text);
         title.setText(name);
 
-        ImageView mangaCoverSmall = findViewById(R.id.manga_cover_small);
+        //ImageView mangaCoverSmall = findViewById(R.id.manga_cover_small);
 
-        mangaCoverSmall.bringToFront();
-        FrameLayout fl = findViewById(R.id.fl);
-        fl.invalidate();
+        //mangaCoverSmall.bringToFront();
+        //FrameLayout fl = findViewById(R.id.fl);
+        //fl.invalidate();
 
         LoadBackgroundImages loadBackgroundImages = new LoadBackgroundImages(mangaUrl);
         loadBackgroundImages.execute();
 
+        setTitle(name);
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
-        setTitle(name);
 
         LoadChapters loadChapters = new LoadChapters(mangaUrl);
         loadChapters.execute();
@@ -80,37 +80,45 @@ public class MangaInfoActiviy extends AppCompatActivity {
     }
 
 
+    public void loadBookmark(final Manga m) {
+        SharedPreferences sharedPref = getApplicationContext().getSharedPreferences("bookmarks",
+                Context.MODE_PRIVATE);
+        final String mangaData = sharedPref.getString(m.title,"No Data");
+        if (!mangaData.equals("No Data")) {
+            String[] tokens = mangaData.split(",");
+            final int lastVisitedChapter = Integer.parseInt(tokens[0]);
+            Button lastVisitedButton = findViewById(R.id.last_visited_button);
+            lastVisitedButton.setVisibility(View.VISIBLE);
+            String url = m.chaptersLinks[lastVisitedChapter];
+
+
+            final String chapterName = "Chapter " + url.substring(url.indexOf("chapter_") + "chapter_".length());
+            lastVisitedButton.setText("Continue to " + chapterName);
+            lastVisitedButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Intent intent = new Intent(getApplicationContext(),ReadingActivity.class);
+                    intent.putExtra("chapterUrls",m.chaptersLinks);
+                    intent.putExtra("chapterNumber",lastVisitedChapter);
+                    intent.putExtra("name",m.title);
+                    intent.putExtra("mangaUrl",mangaUrl);
+                    intent.putExtra("imgUrl",imgUrl);
+
+                    getApplicationContext().startActivity(intent);
+                }
+            });
+        }
+    }
+
+
     @Override
     public void onResume()
     {
         super.onResume();
 
         if (getManga() != null) {
-
-            SharedPreferences sharedPref = getApplicationContext().getSharedPreferences("bookmarks",
-                    Context.MODE_PRIVATE);
-            final int lastVisitedChapter = sharedPref.getInt(getManga().title,-1);
-            if (lastVisitedChapter > -1) {
-                Button lastVisitedButton = findViewById(R.id.last_visited_button);
-                lastVisitedButton.setVisibility(View.VISIBLE);
-                String url = getManga().chaptersLinks[lastVisitedChapter];
-                String chapterName = "Chapter " + url.substring(url.indexOf("chapter_") + "chapter_".length());
-                lastVisitedButton.setText("Continue to " + chapterName);
-                lastVisitedButton.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        Intent intent = new Intent(getApplicationContext(),ReadingActivity.class);
-                        intent.putExtra("chapterUrls",getManga().chaptersLinks);
-                        intent.putExtra("chapterNumber",lastVisitedChapter);
-                        intent.putExtra("name",getManga().title);
-
-                        getApplicationContext().startActivity(intent);
-                    }
-                });
-            }
+            loadBookmark(getManga());
         }
-
-
     }
 
     @Override
@@ -139,6 +147,8 @@ public class MangaInfoActiviy extends AppCompatActivity {
 
             Manga manga = new Manga();
             manga.title = name;
+            manga.mangaUrl = mangaUrl;
+            manga.imgUrl = imgUrl;
 
             InputStream is;
             List<String> chapterUrls = new ArrayList<>();
@@ -206,7 +216,6 @@ public class MangaInfoActiviy extends AppCompatActivity {
             c = reverse.toArray(c);
 
             manga.chaptersLinks = c;
-            manga.title = name;
             return manga;
         }
 
@@ -226,7 +235,7 @@ public class MangaInfoActiviy extends AppCompatActivity {
             TextView author = findViewById(R.id.author_text);
 
             MangaInfoAdapter browserAdapter = new MangaInfoAdapter(m,getApplicationContext());
-            rv.setNestedScrollingEnabled(false);
+            rv.setNestedScrollingEnabled(true);
             rv.setAdapter(browserAdapter);
 
             TransitionManager.beginDelayedTransition(card);
@@ -235,27 +244,8 @@ public class MangaInfoActiviy extends AppCompatActivity {
             pb.setVisibility(View.GONE);
 
 
-            SharedPreferences sharedPref = getApplicationContext().getSharedPreferences("bookmarks",
-                    Context.MODE_PRIVATE);
-            final int lastVisitedChapter = sharedPref.getInt(m.title,-1);
-            if (lastVisitedChapter > -1) {
-                Button lastVisitedButton = findViewById(R.id.last_visited_button);
-                lastVisitedButton.setVisibility(View.VISIBLE);
-                String url = m.chaptersLinks[lastVisitedChapter];
-                String chapterName = "Chapter " + url.substring(url.indexOf("chapter_") + "chapter_".length());
-                lastVisitedButton.setText("Continue to " + chapterName);
-                lastVisitedButton.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        Intent intent = new Intent(getApplicationContext(),ReadingActivity.class);
-                        intent.putExtra("chapterUrls",m.chaptersLinks);
-                        intent.putExtra("chapterNumber",lastVisitedChapter);
-                        intent.putExtra("name",m.title);
+            loadBookmark(m);
 
-                        getApplicationContext().startActivity(intent);
-                    }
-                });
-            }
             rv.setVisibility(View.VISIBLE);
 
 
@@ -265,20 +255,14 @@ public class MangaInfoActiviy extends AppCompatActivity {
     public void setBackground(Bitmap bitmap)
     {
         ImageView mangaCover = findViewById(R.id.manga_cover);
-        ImageView mangaCoverSmall = findViewById(R.id.manga_cover_small);
-        //mangaCover.setImageBitmap(bitmap);
-        Blurry.with(getApplicationContext())
-                .radius(3)
-                .sampling(1)
-                .from(bitmap)
-                .into(mangaCover);
-        mangaCoverSmall.setImageBitmap(bitmap);
 
-        mangaCoverSmall.bringToFront();
-        FrameLayout fl = findViewById(R.id.fl);
-        fl.invalidate();
-
-
+        if (bitmap != null) {
+            Blurry.with(getApplicationContext())
+                    .radius(3)
+                    .sampling(1)
+                    .from(bitmap)
+                    .into(mangaCover);
+        }
     }
     public class LoadBackgroundImages extends AsyncTask<String, Void, Bitmap> {
 
@@ -299,10 +283,9 @@ public class MangaInfoActiviy extends AppCompatActivity {
             Bitmap bitmap = null;
 
             try {
-                //This is where the input box and number picker changes the manga
-                //String rootUrl = "http://mangakakalot.com/chapter/";
-                URL url = new URL(mangaUrl);
+                //this get the url of no url
 
+                URL url = new URL(mangaUrl);
                 HttpURLConnection connection = (HttpURLConnection) url.openConnection();
                 if (connection instanceof HttpURLConnection) {
                     HttpURLConnection httpURLConnection = (HttpURLConnection) connection;
@@ -321,25 +304,27 @@ public class MangaInfoActiviy extends AppCompatActivity {
                                 inputLine = in.readLine();
                                 mangaCoverUrl = inputLine.substring(inputLine.indexOf("http"),inputLine.indexOf(".jpg") + ".jpg".length());
 
-                                imgurl = mangaCoverUrl;
+                                imgUrl = mangaCoverUrl;
                             }
                         }
                     }
 
 
-                    InputStream iStream = null;
-                    URL u = new URL(mangaCoverUrl);
-                    HttpURLConnection conn = (HttpURLConnection) u.openConnection();
-                    conn.setReadTimeout(5000 /* milliseconds */);
-                    conn.setConnectTimeout(7000 /* milliseconds */);
-                    conn.setRequestMethod("GET");
-                    conn.setDoInput(true);
-                    conn.connect();
-                    iStream = conn.getInputStream();
-                    bitmap = BitmapFactory.decodeStream(iStream);
+
                 }
+
+                InputStream iStream = null;
+                URL u = new URL(mangaCoverUrl);
+                HttpURLConnection conn = (HttpURLConnection) u.openConnection();
+                conn.setReadTimeout(5000 /* milliseconds */);
+                conn.setConnectTimeout(7000 /* milliseconds */);
+                conn.setRequestMethod("GET");
+                conn.setDoInput(true);
+                conn.connect();
+                iStream = conn.getInputStream();
+                bitmap = BitmapFactory.decodeStream(iStream);
             } catch (Exception e) {
-                Toast.makeText(getApplicationContext(), "Unable to load ", Toast.LENGTH_LONG).show();
+                //Toast.makeText(getApplicationContext(), "Unable to load ", Toast.LENGTH_LONG).show();
 
                 e.printStackTrace();
             }

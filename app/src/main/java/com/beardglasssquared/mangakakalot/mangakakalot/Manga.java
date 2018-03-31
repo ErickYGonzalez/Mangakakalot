@@ -24,6 +24,8 @@ public class Manga {
     String description;
     String author;
     String[] chaptersLinks;
+    public String mangaUrl;
+    public String imgUrl;
 
     public Manga (String title, String[] chaptersLinks)
     {

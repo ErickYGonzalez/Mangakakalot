@@ -42,12 +42,8 @@ public class MangaInfoAdapter extends RecyclerView.Adapter<MangaInfoAdapter.More
                 intent.putExtra("chapterUrls",urls);
                 intent.putExtra("chapterNumber",position);
                 intent.putExtra("name",manga.title);
-
-                SharedPreferences sharedPref = context.getSharedPreferences("bookmarks",
-                        Context.MODE_PRIVATE);
-                SharedPreferences.Editor editor = sharedPref.edit();
-                editor.putInt(manga.title,position);
-                editor.commit();
+                intent.putExtra("mangaUrl",manga.mangaUrl);
+                intent.putExtra("imgUrl",manga.imgUrl);
 
                 context.startActivity(intent);
             }
@@ -67,7 +63,7 @@ public class MangaInfoAdapter extends RecyclerView.Adapter<MangaInfoAdapter.More
         TextView tv;
         public MoreInfoHolder(View v) {
             super(v);
-            tv = (TextView) v.findViewById(R.id.text_chapter_number);
+            tv = v.findViewById(R.id.text_chapter_number);
         }
     }
 }
