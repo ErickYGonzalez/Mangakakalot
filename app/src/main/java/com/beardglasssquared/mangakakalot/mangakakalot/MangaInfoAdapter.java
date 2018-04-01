@@ -44,6 +44,7 @@ public class MangaInfoAdapter extends RecyclerView.Adapter<MangaInfoAdapter.More
                 intent.putExtra("name",manga.title);
                 intent.putExtra("mangaUrl",manga.mangaUrl);
                 intent.putExtra("imgUrl",manga.imgUrl);
+                intent.putExtra("pageNumber",0);
 
                 context.startActivity(intent);
             }

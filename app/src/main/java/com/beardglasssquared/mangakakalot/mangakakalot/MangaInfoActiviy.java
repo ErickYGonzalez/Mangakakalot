@@ -6,21 +6,27 @@ import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
+import android.media.Image;
 import android.os.AsyncTask;
 import android.preference.PreferenceManager;
 import android.provider.ContactsContract;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
+import android.util.Log;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -41,6 +47,8 @@ public class MangaInfoActiviy extends AppCompatActivity {
 
     String name, imgUrl, mangaUrl;
     Manga finishedManga;
+    ImageView mangaCover, mangaCoverSmall;
+    RecyclerView rv;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,11 +64,11 @@ public class MangaInfoActiviy extends AppCompatActivity {
         TextView title = findViewById(R.id.title_text);
         title.setText(name);
 
-        //ImageView mangaCoverSmall = findViewById(R.id.manga_cover_small);
+        mangaCoverSmall = findViewById(R.id.manga_cover_small);
 
-        //mangaCoverSmall.bringToFront();
-        //FrameLayout fl = findViewById(R.id.fl);
-        //fl.invalidate();
+        mangaCoverSmall.bringToFront();
+        FrameLayout fl = findViewById(R.id.fl);
+        fl.invalidate();
 
         LoadBackgroundImages loadBackgroundImages = new LoadBackgroundImages(mangaUrl);
         loadBackgroundImages.execute();
@@ -87,6 +95,7 @@ public class MangaInfoActiviy extends AppCompatActivity {
         if (!mangaData.equals("No Data")) {
             String[] tokens = mangaData.split(",");
             final int lastVisitedChapter = Integer.parseInt(tokens[0]);
+            final int lastVistedPage = Integer.parseInt(tokens[2]);
             Button lastVisitedButton = findViewById(R.id.last_visited_button);
             lastVisitedButton.setVisibility(View.VISIBLE);
             String url = m.chaptersLinks[lastVisitedChapter];
@@ -103,6 +112,7 @@ public class MangaInfoActiviy extends AppCompatActivity {
                     intent.putExtra("name",m.title);
                     intent.putExtra("mangaUrl",mangaUrl);
                     intent.putExtra("imgUrl",imgUrl);
+                    intent.putExtra("pageNumber",lastVistedPage);
 
                     getApplicationContext().startActivity(intent);
                 }
@@ -122,11 +132,83 @@ public class MangaInfoActiviy extends AppCompatActivity {
     }
 
     @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.info_menu, menu);
+        return true;
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            // Respond to the action bar's Up/Home button
             case android.R.id.home:
                 this.finish();
+                return true;
+
+
+            /* Tokens Key
+            0 - Chapter number (int/index)
+            1 - Chapter name (string)
+            2 - page progress (int/index)
+            3 - Manga Url (String)
+            4 - Image Url (String)
+            5 - time
+            6 = isFav (bool)
+         */
+            case R.id.fav:
+                SharedPreferences sharedPref = getApplicationContext().getSharedPreferences("bookmarks",
+                        Context.MODE_PRIVATE);
+                final String mangaData = sharedPref.getString(name,"No Data");
+                if (!mangaData.equals("No Data")) {
+                    String[] tokens = mangaData.split(",");
+                    boolean isFav = Boolean.parseBoolean(tokens[6]);
+
+
+                    if (isFav) item.setIcon(R.drawable.ic_favorite_border_white_24dp);
+                    else item.setIcon(R.drawable.ic_favorite_white_24dp);
+
+
+                    Log.d("Is fav",String.valueOf(isFav));
+
+
+                    SharedPreferences.Editor editor = sharedPref.edit();
+                    editor.putString(name,
+                            tokens[0] + "," +
+                                    tokens[1] + "," +
+                                    tokens[2] + "," +
+                                    tokens[3] + "," +
+                                    tokens[4] + "," +
+                                    tokens[5] + "," +
+                                    String.valueOf(isFav));
+                } else {
+                    item.setIcon(R.drawable.ic_favorite_white_24dp);
+
+                    SharedPreferences.Editor editor = sharedPref.edit();
+                    editor.putString(name,
+                            "0" + "," +
+                                    "1" + "," +
+                                    "0" + "," +
+                                    mangaUrl + "," +
+                                    imgUrl + "," +
+                                    0 + "," +
+                                    true);
+                }
+                return true;
+            case R.id.flip:
+
+                ArrayList<String> reverse = new ArrayList<>(finishedManga.chaptersLinks.length);
+                for (int i = 0; i < finishedManga.chaptersLinks.length; i++)
+                {
+                    reverse.add(finishedManga.chaptersLinks[finishedManga.chaptersLinks.length - i - 1]);
+                }
+
+                String[] c = new String[reverse.size()];
+                c = reverse.toArray(c);
+
+                finishedManga.chaptersLinks = c;
+
+                rv.getAdapter().notifyDataSetChanged();
+
                 return true;
         }
         return super.onOptionsItemSelected(item);
@@ -135,7 +217,7 @@ public class MangaInfoActiviy extends AppCompatActivity {
     public class LoadChapters extends AsyncTask<String, Void, Manga> {
 
         ProgressBar pb;
-        RecyclerView rv;
+
         String mangaUrl;
 
         public LoadChapters(String mangaUrl) {
@@ -254,7 +336,8 @@ public class MangaInfoActiviy extends AppCompatActivity {
 
     public void setBackground(Bitmap bitmap)
     {
-        ImageView mangaCover = findViewById(R.id.manga_cover);
+        mangaCoverSmall.setImageBitmap(bitmap);
+        mangaCover = findViewById(R.id.manga_cover);
 
         if (bitmap != null) {
             Blurry.with(getApplicationContext())

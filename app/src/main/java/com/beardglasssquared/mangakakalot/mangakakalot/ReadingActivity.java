@@ -44,11 +44,12 @@ import java.util.List;
 
 public class ReadingActivity extends AppCompatActivity {
 
-    int chapterNumber = 0;
+    int chapterNumber, pageNumber;
     LoadImage imageLoader;
     String[] chapterUrls;
     boolean isBottomExpanded = false;
     String name, mangaUrl, imgUrl;
+    LinearLayoutManager llm;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -61,10 +62,11 @@ public class ReadingActivity extends AppCompatActivity {
         //Retrieves urls from InfoPage
         Bundle extras = getIntent().getExtras();
         chapterUrls = extras.getStringArray("chapterUrls");
-        chapterNumber = extras.getInt("chapterNumber");
+        chapterNumber = extras.getInt("chapterNumber",0);
         name = extras.getString("name");
         mangaUrl = extras.getString("mangaUrl");
         imgUrl = extras.getString("imgUrl");
+        pageNumber = extras.getInt("pageNumber",0);
 
 
         //Pulls the urls for manga images
@@ -383,24 +385,22 @@ public class ReadingActivity extends AppCompatActivity {
             pb = findViewById(R.id.progressBar);
             rv = findViewById(R.id.recycle_view);
 
-
-            LinearLayoutManager llm = new LinearLayoutManager(getApplicationContext());
-            llm.setOrientation(LinearLayoutManager.VERTICAL);
-            rv.setLayoutManager(llm);
-
             final ImageAdapter ca = new ImageAdapter(urls, getApplicationContext(), rv);
 
-            setUpZoomBar();
-            saveBookmark(0);
-
-
+            llm = new LinearLayoutManager(getApplicationContext());
+            llm.setOrientation(LinearLayoutManager.VERTICAL);
+            rv.setLayoutManager(llm);
             rv.setAdapter(ca);
-
             rv.setVisibility(View.VISIBLE);
+
+            setUpZoomBar();
+            saveBookmark();
+
+            rv.scrollToPosition(pageNumber);
             pb.setVisibility(View.GONE);
         }
 
-        public void saveBookmark(int page)
+        public void saveBookmark()
         {
             SharedPreferences sharedPref = getApplicationContext().getSharedPreferences("bookmarks",
                     Context.MODE_PRIVATE);
@@ -412,14 +412,20 @@ public class ReadingActivity extends AppCompatActivity {
                     2 - page progress (int/index)
                     3 - Manga Url (String)
                     4 - Image Url (String)
-                    5 = isFav (bool)
+                    5 - time
+                    6 = isFav (bool)
                  */
             String time = String.valueOf(System.currentTimeMillis());
 
+
             if (rv != null) {
-                editor.putString(name, String.valueOf(chapterNumber) + "," +
+                pageNumber = 0;
+                if (pageNumber < 0 || pageNumber > chapterUrls.length - 1) pageNumber = 0;
+
+                editor.putString(name,
+                        String.valueOf(chapterNumber) + "," +
                         getChapterName(chapterNumber) + "," +
-                        String.valueOf(rv.getVerticalScrollbarPosition()) + "," +
+                        String.valueOf(pageNumber) + "," +
                         mangaUrl    + "," +
                         imgUrl      + "," +
                         time        + "," +
@@ -436,6 +442,14 @@ public class ReadingActivity extends AppCompatActivity {
                         "false");
             }
             editor.commit();
+
+
+            Log.d("Info: ", String.valueOf(chapterNumber) + " , " +
+                    getChapterName(chapterNumber) + " , " +
+                    "0"         + " , " +
+                    mangaUrl    + " , " +
+                    imgUrl      + " , " +
+                    time        + " , ");
         }
         public void setUpZoomBar()
         {
