@@ -97,17 +97,17 @@ public class RecentReadFragment extends Fragment {
                     6 = isFav (bool)
                  */
 
-                if (!tokens[0] .equals("0")) {
-                    String title = entry.getKey();
-                    String imageUrl = tokens[4];
-                    String mangaUrl = tokens[3];
-                    long time = Long.parseLong(tokens[5]);
-                    Log.d("Saved: ", mangaData);
-                    MangaLink mangaLink = new MangaLink(title,imageUrl,"",mangaUrl,time);
-                    mangaLinks.add(mangaLink);
-                    Collections.sort(mangaLinks);
-                }
+
+                String title = entry.getKey();
+                String imageUrl = tokens[4];
+                String mangaUrl = tokens[3];
+                long time = Long.parseLong(tokens[5]);
+                MangaLink mangaLink = new MangaLink(title,imageUrl,"",mangaUrl,time);
+                mangaLinks.add(mangaLink);
+                Collections.sort(mangaLinks);
+
             }
+
 
             LinearLayoutManager llm = new LinearLayoutManager(getContext());
             llm.setOrientation(LinearLayoutManager.VERTICAL);
@@ -120,7 +120,13 @@ public class RecentReadFragment extends Fragment {
             recent_rv.setAdapter(browserAdapter);
 
             recent_rv.setVisibility(View.VISIBLE);
-            recent_tv.setVisibility(View.GONE);
+
+            if (mangaLinks.size() < 1) {
+                recent_tv.setVisibility(View.VISIBLE);
+            } else{
+
+                recent_tv.setVisibility(View.GONE);
+            }
 
         } else {
             recent_tv.setVisibility(View.VISIBLE);
@@ -158,16 +164,13 @@ public class RecentReadFragment extends Fragment {
                     String imageUrl = tokens[4];
                     String mangaUrl = tokens[3];
                     long time = Long.parseLong(tokens[5]);
-                    Log.d("Saved: ", mangaData);
+                    Log.d("Favorites: ", mangaData);
                     MangaLink mangaLink = new MangaLink(title,imageUrl,"",mangaUrl,time);
                     mangaLinks.add(mangaLink);
                     Collections.sort(mangaLinks);
                 }
             }
 
-            if (mangaLinks.size() < 1) {
-                fav_tv.setVisibility(View.VISIBLE);
-            }
 
             LinearLayoutManager llm = new LinearLayoutManager(getContext());
             llm.setOrientation(LinearLayoutManager.VERTICAL);
@@ -180,7 +183,12 @@ public class RecentReadFragment extends Fragment {
             fav_rv.setAdapter(browserAdapter);
 
             fav_rv.setVisibility(View.VISIBLE);
-            fav_tv.setVisibility(View.GONE);
+
+            if (mangaLinks.size() < 1) {
+                fav_tv.setVisibility(View.VISIBLE);
+            } else  {
+                fav_tv.setVisibility(View.GONE);
+            }
         } else {
             fav_tv.setVisibility(View.VISIBLE);
         }

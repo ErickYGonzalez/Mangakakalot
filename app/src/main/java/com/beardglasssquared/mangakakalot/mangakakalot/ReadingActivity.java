@@ -400,8 +400,7 @@ public class ReadingActivity extends AppCompatActivity {
             pb.setVisibility(View.GONE);
         }
 
-        public void saveBookmark()
-        {
+        public void saveBookmark() {
             SharedPreferences sharedPref = getApplicationContext().getSharedPreferences("bookmarks",
                     Context.MODE_PRIVATE);
             SharedPreferences.Editor editor = sharedPref.edit();
@@ -417,58 +416,48 @@ public class ReadingActivity extends AppCompatActivity {
                  */
             String time = String.valueOf(System.currentTimeMillis());
 
-            final String mangaData = sharedPref.getString(mangaName,"No Data");
-            Log.d("Manga data: ", mangaData);
+            final String mangaData = sharedPref.getString(name, "No Data");
+            Log.d("Manga data for " + name, mangaData);
             String[] tokens = mangaData.split(",");
-            if (!mangaData.equals("No Data"))
-            {
-                if (rv != null) {
-                    pageNumber = 0;
-                    if (pageNumber < 0 || pageNumber > chapterUrls.length - 1) pageNumber = 0;
+            if (!mangaData.equals("No Data")) {
+                editor.putString(name,
+                        String.valueOf(chapterNumber) + "," +
+                                getChapterName(chapterNumber) + "," +
+                                "0" + "," +
+                                mangaUrl + "," +
+                                imgUrl + "," +
+                                time + "," +
+                                tokens[6]);
 
-                    editor.putString(name,
-                            String.valueOf(chapterNumber) + "," +
-                                    getChapterName(chapterNumber) + "," +
-                                    "0" + "," +
-                                    mangaUrl    + "," +
-                                    imgUrl      + "," +
-                                    time        + "," +
-                                    tokens[6]);
-
-                } else {
-                    editor.putString(name,
-                            String.valueOf(chapterNumber) + "," +
-                                    getChapterName(chapterNumber) + "," +
-                                    "0"         + "," +
-                                    mangaUrl    + "," +
-                                    imgUrl      + "," +
-                                    time        + "," +
-                                    tokens[6]);
-                }
+                Log.d("Info: ",
+                        String.valueOf(chapterNumber) + " , " +
+                                getChapterName(chapterNumber) + " , " +
+                                "0" + " , " +
+                                mangaUrl + " , " +
+                                imgUrl + " , " +
+                                time + " , " +
+                                tokens[6]);
             } else {
                 editor.putString(name,
                         String.valueOf(chapterNumber) + "," +
                                 getChapterName(chapterNumber) + "," +
-                                "0"         + "," +
-                                mangaUrl    + "," +
-                                imgUrl      + "," +
-                                time        + "," +
+                                "0" + "," +
+                                mangaUrl + "," +
+                                imgUrl + "," +
+                                time + "," +
                                 Boolean.valueOf(false));
+                Log.d("Info: ",
+                        String.valueOf(chapterNumber) + " , " +
+                                getChapterName(chapterNumber) + " , " +
+                                "0" + " , " +
+                                mangaUrl + " , " +
+                                imgUrl + " , " +
+                                time + " , " +
+                                "false (" + name + "not found)");
             }
             editor.commit();
-
-
-            Log.d("Info: ",
-                    String.valueOf(chapterNumber) + " , " +
-                        getChapterName(chapterNumber) + " , " +
-                        "0"         + " , " +
-                        mangaUrl    + " , " +
-                        imgUrl      + " , " +
-                        time        + " , " +
-                        "");
-
-
         }
+
         public void setUpZoomBar()
         {
             SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());

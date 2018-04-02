@@ -5,15 +5,23 @@ import android.os.AsyncTask;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.SearchView;
+import android.widget.TextView;
 import android.widget.Toast;
+
+import com.transitionseverywhere.Transition;
+import com.transitionseverywhere.TransitionManager;
+
+import org.w3c.dom.Text;
 
 import java.io.BufferedReader;
 import java.io.InputStream;
@@ -43,6 +51,8 @@ public class SearchActivity extends AppCompatActivity {
 
         search = new GetSearch(searchTerm);
         search.execute(searchTerm);
+
+
     }
 
     @Override
@@ -108,6 +118,12 @@ public class SearchActivity extends AppCompatActivity {
 
         public GetSearch(String s)
         {
+            TextView tv = findViewById(R.id.search_tv);
+            tv.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
+            tv.setText("Results for: " + s);
+            TransitionManager.beginDelayedTransition((CardView)findViewById(R.id.search_card));
+            tv.setVisibility(View.VISIBLE);
+
             searchTerm = s;
             if (searchTerm.contains(" ")) {
                 searchTerm = searchTerm.replace(" ","_");
@@ -170,9 +186,12 @@ public class SearchActivity extends AppCompatActivity {
 
         protected void onPostExecute(List<MangaLink> urls) {
 
+            LinearLayout ll = findViewById(R.id.search_ll);
+            TextView tv = findViewById(R.id.search_tv);
+
+
             pb = findViewById(R.id.progressBar);
             rv = findViewById(R.id.recycle_view);
-
 
             LinearLayoutManager llm = new LinearLayoutManager(getApplicationContext());
             llm.setOrientation(LinearLayoutManager.VERTICAL);
@@ -181,8 +200,20 @@ public class SearchActivity extends AppCompatActivity {
             SearchAdapter searchAdapter = new SearchAdapter(getApplicationContext(),urls);
             rv.setAdapter(searchAdapter);
 
+            TransitionManager.beginDelayedTransition(ll);
             rv.setVisibility(View.VISIBLE);
+
+            if (urls.size() <= 0) {
+                tv.setText("No Results Found");
+            }
+
+
+
+
             pb.setVisibility(View.GONE);
+
+
+
         }
     }
 

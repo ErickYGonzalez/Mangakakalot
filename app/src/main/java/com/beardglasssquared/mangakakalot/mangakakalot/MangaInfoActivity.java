@@ -188,6 +188,13 @@ public class MangaInfoActivity extends AppCompatActivity {
                                     tokens[4] + "," +
                                     time + "," +
                                     Boolean.valueOf(!isFav));
+
+                    //This is opposite of the logic
+                    if (isFav) {
+                        Toast.makeText(getApplicationContext(),"Removed From Favorites",Toast.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(getApplicationContext(),"Added To Favorites",Toast.LENGTH_SHORT).show();
+                    }
                 } else {
                     item.setIcon(R.drawable.ic_favorite_white_24dp);
                     editor.putString(name,
