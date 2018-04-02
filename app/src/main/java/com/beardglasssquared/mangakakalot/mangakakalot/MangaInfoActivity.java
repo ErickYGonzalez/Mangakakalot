@@ -43,7 +43,7 @@ import java.util.List;
 
 import jp.wasabeef.blurry.Blurry;
 
-public class MangaInfoActiviy extends AppCompatActivity {
+public class MangaInfoActivity extends AppCompatActivity {
 
     String name, imgUrl, mangaUrl;
     Manga finishedManga;
@@ -135,6 +135,15 @@ public class MangaInfoActiviy extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.info_menu, menu);
+        SharedPreferences sharedPref = getApplicationContext().getSharedPreferences("bookmarks",
+                Context.MODE_PRIVATE);
+        final String mangaData = sharedPref.getString(name,"No Data");
+        if (!mangaData.equals("No Data")) {
+            String[] tokens = mangaData.split(",");
+
+            if (tokens[6].equals("false")) menu.getItem(0).setIcon(R.drawable.ic_favorite_border_white_24dp);
+            else menu.getItem(0).setIcon(R.drawable.ic_favorite_white_24dp);
+        }
         return true;
     }
 
@@ -159,41 +168,43 @@ public class MangaInfoActiviy extends AppCompatActivity {
                 SharedPreferences sharedPref = getApplicationContext().getSharedPreferences("bookmarks",
                         Context.MODE_PRIVATE);
                 final String mangaData = sharedPref.getString(name,"No Data");
+                SharedPreferences.Editor editor = sharedPref.edit();
+
+                String time = String.valueOf(System.currentTimeMillis());
+
                 if (!mangaData.equals("No Data")) {
                     String[] tokens = mangaData.split(",");
-                    boolean isFav = Boolean.parseBoolean(tokens[6]);
 
-
-                    if (isFav) item.setIcon(R.drawable.ic_favorite_border_white_24dp);
+                    if (tokens[6].equals("true")) item.setIcon(R.drawable.ic_favorite_border_white_24dp);
                     else item.setIcon(R.drawable.ic_favorite_white_24dp);
 
+                    boolean isFav = Boolean.parseBoolean(tokens[6]);
 
-                    Log.d("Is fav",String.valueOf(isFav));
-
-
-                    SharedPreferences.Editor editor = sharedPref.edit();
                     editor.putString(name,
                             tokens[0] + "," +
                                     tokens[1] + "," +
                                     tokens[2] + "," +
                                     tokens[3] + "," +
                                     tokens[4] + "," +
-                                    tokens[5] + "," +
-                                    String.valueOf(isFav));
+                                    time + "," +
+                                    Boolean.valueOf(!isFav));
                 } else {
                     item.setIcon(R.drawable.ic_favorite_white_24dp);
-
-                    SharedPreferences.Editor editor = sharedPref.edit();
                     editor.putString(name,
                             "0" + "," +
                                     "1" + "," +
                                     "0" + "," +
                                     mangaUrl + "," +
                                     imgUrl + "," +
-                                    0 + "," +
-                                    true);
+                                    time + "," +
+                                    Boolean.valueOf(true));
                 }
+                editor.commit();
+
+
+                Log.d("Mangadata: ", sharedPref.getString(name,"No Data"));
                 return true;
+
             case R.id.flip:
 
                 ArrayList<String> reverse = new ArrayList<>(finishedManga.chaptersLinks.length);
@@ -217,7 +228,6 @@ public class MangaInfoActiviy extends AppCompatActivity {
     public class LoadChapters extends AsyncTask<String, Void, Manga> {
 
         ProgressBar pb;
-
         String mangaUrl;
 
         public LoadChapters(String mangaUrl) {

@@ -12,7 +12,6 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.github.chrisbanes.photoview.PhotoView;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
@@ -79,17 +78,17 @@ public class BrowserAdapter extends RecyclerView.Adapter<BrowserAdapter.BrowserH
         final int leftIndex = position * 2;
         final int rightIndex = position * 2 + 1;
 
-        if (leftIndex < urls.size() - 1)
+        if (leftIndex < urls.size())
         {
             holder.cardL.setVisibility(View.VISIBLE);
             Picasso.with(context).load(urls.get(leftIndex).imageUrl).into(holder.imageL);
             holder.titleL.setText(urls.get(leftIndex).title);
-            holder.chapterL.setText(urls.get(rightIndex).chapters);
+            holder.chapterL.setText(urls.get(leftIndex).chapters);
 
             holder.imageL.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    Intent intent = new Intent(context, MangaInfoActiviy.class);
+                    Intent intent = new Intent(context, MangaInfoActivity.class);
 
 
                     String imgUrl = urls.get(leftIndex).imageUrl;
@@ -117,7 +116,7 @@ public class BrowserAdapter extends RecyclerView.Adapter<BrowserAdapter.BrowserH
             holder.imageR.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    Intent intent = new Intent(context, MangaInfoActiviy.class);
+                    Intent intent = new Intent(context, MangaInfoActivity.class);
 
                     String imgUrl = urls.get(rightIndex).imageUrl;
                     String name = urls.get(rightIndex).title;

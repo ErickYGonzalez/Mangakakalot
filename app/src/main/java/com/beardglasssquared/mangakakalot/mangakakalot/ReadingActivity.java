@@ -417,39 +417,57 @@ public class ReadingActivity extends AppCompatActivity {
                  */
             String time = String.valueOf(System.currentTimeMillis());
 
+            final String mangaData = sharedPref.getString(mangaName,"No Data");
+            Log.d("Manga data: ", mangaData);
+            String[] tokens = mangaData.split(",");
+            if (!mangaData.equals("No Data"))
+            {
+                if (rv != null) {
+                    pageNumber = 0;
+                    if (pageNumber < 0 || pageNumber > chapterUrls.length - 1) pageNumber = 0;
 
-            if (rv != null) {
-                pageNumber = 0;
-                if (pageNumber < 0 || pageNumber > chapterUrls.length - 1) pageNumber = 0;
+                    editor.putString(name,
+                            String.valueOf(chapterNumber) + "," +
+                                    getChapterName(chapterNumber) + "," +
+                                    "0" + "," +
+                                    mangaUrl    + "," +
+                                    imgUrl      + "," +
+                                    time        + "," +
+                                    tokens[6]);
 
-                editor.putString(name,
-                        String.valueOf(chapterNumber) + "," +
-                        getChapterName(chapterNumber) + "," +
-                        String.valueOf(pageNumber) + "," +
-                        mangaUrl    + "," +
-                        imgUrl      + "," +
-                        time        + "," +
-                        "false");
-
+                } else {
+                    editor.putString(name,
+                            String.valueOf(chapterNumber) + "," +
+                                    getChapterName(chapterNumber) + "," +
+                                    "0"         + "," +
+                                    mangaUrl    + "," +
+                                    imgUrl      + "," +
+                                    time        + "," +
+                                    tokens[6]);
+                }
             } else {
                 editor.putString(name,
                         String.valueOf(chapterNumber) + "," +
-                        getChapterName(chapterNumber) + "," +
-                        "0"         + "," +
-                        mangaUrl    + "," +
-                        imgUrl      + "," +
-                        time        + "," +
-                        "false");
+                                getChapterName(chapterNumber) + "," +
+                                "0"         + "," +
+                                mangaUrl    + "," +
+                                imgUrl      + "," +
+                                time        + "," +
+                                Boolean.valueOf(false));
             }
             editor.commit();
 
 
-            Log.d("Info: ", String.valueOf(chapterNumber) + " , " +
-                    getChapterName(chapterNumber) + " , " +
-                    "0"         + " , " +
-                    mangaUrl    + " , " +
-                    imgUrl      + " , " +
-                    time        + " , ");
+            Log.d("Info: ",
+                    String.valueOf(chapterNumber) + " , " +
+                        getChapterName(chapterNumber) + " , " +
+                        "0"         + " , " +
+                        mangaUrl    + " , " +
+                        imgUrl      + " , " +
+                        time        + " , " +
+                        "");
+
+
         }
         public void setUpZoomBar()
         {

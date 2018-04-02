@@ -15,7 +15,7 @@
             android:name=".ReadingActivity"
             android:theme="@style/AppTheme.NoActionBar"></activity>
         <activity android:name=".MangaBrowserActivity"></activity>
-        <activity android:name=".MangaInfoActiviy"></activity>
+        <activity android:name=".MangaInfoActivity"></activity>
         <activity
             android:name=".MainActivity"
             android:label="@string/title_activity_main"
