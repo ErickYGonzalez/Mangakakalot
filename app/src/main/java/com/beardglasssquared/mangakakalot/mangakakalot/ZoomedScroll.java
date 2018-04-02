@@ -21,6 +21,7 @@ import static android.view.MotionEvent.INVALID_POINTER_ID;
 
 public class ZoomedScroll implements View.OnTouchListener {
     private float xTouch,yTouch;
+    private float xi,yi;
 
     int height, width;
 
@@ -65,6 +66,8 @@ public class ZoomedScroll implements View.OnTouchListener {
                 photoView.setScale(1.5f,xOffset ,yOffset ,true);
                 */
 
+                xi = ev.getX();
+                yi = ev.getY();
 
                 xTouch = ev.getX();
                 yTouch = ev.getY();
@@ -79,6 +82,8 @@ public class ZoomedScroll implements View.OnTouchListener {
 
                             //recyclerView.smoothScrollToPosition(position);
                             photoView.setZoomTransitionDuration(100);
+
+
 
                             SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
                             int pos = sharedPref.getInt(context.getString(R.string.zoom_amount),1);
