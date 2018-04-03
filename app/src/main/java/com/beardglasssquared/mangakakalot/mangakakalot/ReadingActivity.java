@@ -367,9 +367,9 @@ public class ReadingActivity extends AppCompatActivity {
                     }
                 }
             } catch (Exception e) {
-                Toast.makeText(getApplicationContext(), "Unable to load ", Toast.LENGTH_LONG).show();
 
                 e.printStackTrace();
+                Toast.makeText(getApplicationContext(), "Unable to load ", Toast.LENGTH_LONG).show();
             }
             return urls;
         }
