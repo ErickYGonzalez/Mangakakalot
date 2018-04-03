@@ -62,6 +62,7 @@ public class MangaInfoActivity extends AppCompatActivity {
     Manga finishedManga;
     ImageView mangaCover, mangaCoverSmall;
     RecyclerView rv;
+    int mainColor, titleColor, bodyColor,secondColor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,6 +74,11 @@ public class MangaInfoActivity extends AppCompatActivity {
         imgUrl = extras.getString("imgurl");
         mangaUrl = extras.getString("mangaUrl");
         name = extras.getString("name");
+        mainColor = extras.getInt("mainColor");
+        titleColor = extras.getInt("titleColor");
+        bodyColor = extras.getInt("bodyColor");
+        secondColor = extras.getInt("secondColor");
+
 
         TextView title = findViewById(R.id.title_text);
         title.setText(name);
@@ -93,8 +99,51 @@ public class MangaInfoActivity extends AppCompatActivity {
 
         LoadChapters loadChapters = new LoadChapters(mangaUrl);
         loadChapters.execute();
+
+        setColor();
+
     }
 
+    public void setColor(){
+        final CardView cardView = findViewById(R.id.card_view);
+        final CoordinatorLayout coordinatorLayout = findViewById(R.id.more_info_coordinator);
+        final View view = findViewById(R.id.gradient);
+
+
+        final TextView title = findViewById(R.id.title_text);
+        final TextView author = findViewById(R.id.author_text);
+        final TextView description = findViewById(R.id.discriptions_text);
+        final LinearLayout ll = findViewById(R.id.ll_more_info);
+
+        title.setTextColor(titleColor);
+        author.setTextColor(bodyColor);
+        description.setTextColor(bodyColor);
+
+
+
+
+        GradientDrawable gd = new GradientDrawable(
+                GradientDrawable.Orientation.TOP_BOTTOM,
+                new int[] {0x00ffffff,secondColor});
+        gd.setCornerRadius(0f);
+
+
+        TransitionManager.beginDelayedTransition(coordinatorLayout);
+
+        view.setBackgroundDrawable(gd);
+        coordinatorLayout.setBackgroundColor(secondColor);
+        cardView.setCardBackgroundColor(mainColor);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            Window window = getWindow();
+            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+            window.setStatusBarColor(secondColor);
+        }
+
+        getSupportActionBar().setBackgroundDrawable(new ColorDrawable(mainColor));
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
+        getSupportActionBar().setDisplayShowTitleEnabled(true);
+    }
     public Manga getManga()
     {
         return finishedManga;
@@ -346,7 +395,7 @@ public class MangaInfoActivity extends AppCompatActivity {
             final TextView description = findViewById(R.id.discriptions_text);
             TextView author = findViewById(R.id.author_text);
 
-            MangaInfoAdapter browserAdapter = new MangaInfoAdapter(m,getApplicationContext());
+            MangaInfoAdapter browserAdapter = new MangaInfoAdapter(m,getApplicationContext(),mainColor,titleColor);
             rv.setNestedScrollingEnabled(true);
             rv.setAdapter(browserAdapter);
 
@@ -366,55 +415,9 @@ public class MangaInfoActivity extends AppCompatActivity {
 
     public void setBackground(Bitmap bitmap)
     {
-        final CardView cardView = findViewById(R.id.card_view);
-        final TextView title = findViewById(R.id.title_text);
-        final TextView author = findViewById(R.id.author_text);
-        final TextView description = findViewById(R.id.discriptions_text);
-        final LinearLayout ll = findViewById(R.id.ll_more_info);
-        final CoordinatorLayout coordinatorLayout = findViewById(R.id.more_info_coordinator);
-        final View view = findViewById(R.id.gradient);
 
-        Palette.from(bitmap).generate(new Palette.PaletteAsyncListener() {
-                                          @Override
-                                          public void onGenerated(@NonNull Palette palette) {
-                                              Palette.Swatch vibSwatch = palette.getDarkVibrantSwatch();
-                                              Palette.Swatch liteSwatch = palette.getLightVibrantSwatch();
-                                              if (vibSwatch == null) {
-                                                  Toast.makeText(getApplicationContext()
-                                                          , "Null swatch :(", Toast.LENGTH_SHORT).show();
-                                                  return;
-                                              }
-
-                                              GradientDrawable gd = new GradientDrawable(
-                                                      GradientDrawable.Orientation.TOP_BOTTOM,
-                                                      new int[] {0x00ffffff,vibSwatch.getRgb()});
-                                              gd.setCornerRadius(0f);
-
-
-                                              TransitionManager.beginDelayedTransition(coordinatorLayout);
-
-                                              view.setBackgroundDrawable(gd);
-                                              coordinatorLayout.setBackgroundColor(vibSwatch.getRgb());
-                                              title.setTextColor(vibSwatch.getTitleTextColor());
-                                              cardView.setCardBackgroundColor(vibSwatch.getRgb());
-
-                                              author.setTextColor(vibSwatch.getBodyTextColor());
-                                              description.setTextColor(vibSwatch.getBodyTextColor());
-
-                                              if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                                                  Window window = getWindow();
-                                                  window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-                                                  window.setStatusBarColor(vibSwatch.getRgb());
-                                              }
-
-                                              getSupportActionBar().setBackgroundDrawable(new ColorDrawable(vibSwatch.getRgb()));
-                                              getSupportActionBar().setDisplayShowTitleEnabled(false);
-                                              getSupportActionBar().setDisplayShowTitleEnabled(true);
-
-                                          }
-                                      });
-
-
+        CoordinatorLayout coordinatorLayout = findViewById(R.id.more_info_coordinator);
+        TransitionManager.beginDelayedTransition(coordinatorLayout);
         mangaCoverSmall.setImageBitmap(bitmap);
         mangaCover = findViewById(R.id.manga_cover);
 
@@ -425,6 +428,7 @@ public class MangaInfoActivity extends AppCompatActivity {
                     .from(bitmap)
                     .into(mangaCover);
         }
+        TransitionManager.endTransitions(coordinatorLayout);
 
 
     }

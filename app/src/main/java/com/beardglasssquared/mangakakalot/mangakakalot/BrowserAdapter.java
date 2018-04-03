@@ -2,6 +2,11 @@ package com.beardglasssquared.mangakakalot.mangakakalot;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.Color;
+import android.graphics.drawable.BitmapDrawable;
+import android.support.annotation.NonNull;
+import android.support.v7.graphics.Palette;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -11,7 +16,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
@@ -74,14 +81,51 @@ public class BrowserAdapter extends RecyclerView.Adapter<BrowserAdapter.BrowserH
     }
 
     @Override
-    public void onBindViewHolder(BrowserAdapter.BrowserHolder holder, int position) {
+    public void onBindViewHolder(final BrowserAdapter.BrowserHolder holder, int position) {
         final int leftIndex = position * 2;
         final int rightIndex = position * 2 + 1;
-
         if (leftIndex < urls.size())
         {
+            final int[] color = new int[4];
+            color[0] = Color.parseColor("#ffffff");
+            color[1] = Color.parseColor("#000000");
+            color[2] = Color.parseColor("#808080");
+            color[3] = Color.parseColor("#ffffff");
+
             holder.cardL.setVisibility(View.VISIBLE);
-            Picasso.with(context).load(urls.get(leftIndex).imageUrl).into(holder.imageL);
+            Picasso.with(context).load(urls.get(leftIndex).imageUrl).into(holder.imageL, new Callback() {
+                @Override
+                public void onSuccess() {
+                    Bitmap bitmap = ((BitmapDrawable) holder.imageL.getDrawable()).getBitmap();
+                    if (bitmap != null) {
+                        Palette.from(bitmap).generate(new Palette.PaletteAsyncListener() {
+                            @Override
+                            public void onGenerated(@NonNull Palette palette) {
+                                Palette.Swatch vibSwatch = palette.getDarkVibrantSwatch();
+                                if (vibSwatch == null) {
+                                    vibSwatch = palette.getDominantSwatch();
+                                }
+                                color[0] = vibSwatch.getRgb();
+                                color[1] = vibSwatch.getTitleTextColor();
+                                color[2] = vibSwatch.getBodyTextColor();
+                                //Darken primary color to get secondary
+                                int darkerRGB = vibSwatch.getRgb();
+                                float[] hsv = vibSwatch.getHsl();
+                                Color.colorToHSV(darkerRGB, hsv);
+                                hsv[2] *= 0.9f; // value component
+                                color[3] = Color.HSVToColor(hsv);
+                            }
+                        });
+                    }
+                }
+
+                @Override
+                public void onError() {
+
+                }
+            });
+
+
             holder.titleL.setText(urls.get(leftIndex).title);
             holder.chapterL.setText(urls.get(leftIndex).chapters);
 
@@ -99,6 +143,12 @@ public class BrowserAdapter extends RecyclerView.Adapter<BrowserAdapter.BrowserH
                     intent.putExtra("imgurl",imgUrl);
                     intent.putExtra("name",name);
                     intent.putExtra("mangaUrl",mangaUrl);
+                    intent.putExtra("mainColor",color[0]);
+                    intent.putExtra("titleColor",color[1]);
+                    intent.putExtra("bodyColor",color[2]);
+                    intent.putExtra("secondColor",color[3]);
+
+
 
                     context.startActivity(intent);
                 }
@@ -109,8 +159,46 @@ public class BrowserAdapter extends RecyclerView.Adapter<BrowserAdapter.BrowserH
         }
 
         if (rightIndex < urls.size()) {
+            final int[] color = new int[4];
+            color[0] = Color.parseColor("#ffffff");
+            color[1] = Color.parseColor("#000000");
+            color[2] = Color.parseColor("#808080");
+            color[3] = Color.parseColor("#ffffff");
+
             holder.cardR.setVisibility(View.VISIBLE);
-            Picasso.with(context).load(urls.get(rightIndex).imageUrl).into(holder.imageR);
+            Picasso.with(context).load(urls.get(rightIndex).imageUrl).into(holder.imageR, new Callback() {
+                @Override
+                public void onSuccess() {
+                    Bitmap bitmap = ((BitmapDrawable) holder.imageR.getDrawable()).getBitmap();
+                    if (bitmap != null) {
+                        Palette.from(bitmap).generate(new Palette.PaletteAsyncListener() {
+                            @Override
+                            public void onGenerated(@NonNull Palette palette) {
+                                Palette.Swatch vibSwatch = palette.getDarkVibrantSwatch();
+                                if (vibSwatch == null) {
+                                    vibSwatch = palette.getDominantSwatch();
+                                }
+                                color[0] = vibSwatch.getRgb();
+                                color[1] = vibSwatch.getTitleTextColor();
+                                color[2] = vibSwatch.getBodyTextColor();
+
+                                //Darken primary color to get secondary
+                                int darkerRGB = vibSwatch.getRgb();
+                                float[] hsv = vibSwatch.getHsl();
+                                Color.colorToHSV(darkerRGB, hsv);
+                                hsv[2] *= 0.9f; // value component
+                                color[3] = Color.HSVToColor(hsv);
+                            }
+                        });
+                    }
+                }
+
+                @Override
+                public void onError() {
+
+                }
+            });
+
             holder.titleR.setText(urls.get(rightIndex).title);
             holder.chapterR.setText(urls.get(leftIndex).chapters);
             holder.imageR.setOnClickListener(new View.OnClickListener() {
@@ -126,6 +214,11 @@ public class BrowserAdapter extends RecyclerView.Adapter<BrowserAdapter.BrowserH
                     intent.putExtra("imgurl",imgUrl);
                     intent.putExtra("name",name);
                     intent.putExtra("mangaUrl",mangaUrl);
+                    intent.putExtra("mainColor",color[0]);
+                    intent.putExtra("titleColor",color[1]);
+                    intent.putExtra("bodyColor",color[2]);
+                    intent.putExtra("secondColor",color[3]);
+
                     context.startActivity(intent);
                 }
             });

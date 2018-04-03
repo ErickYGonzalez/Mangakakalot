@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,11 +20,14 @@ public class MangaInfoAdapter extends RecyclerView.Adapter<MangaInfoAdapter.More
     Manga manga;
     String[] urls;
     Context context;
+    int cardColor, textColor;
 
-    public MangaInfoAdapter(Manga manga, Context context) {
+    public MangaInfoAdapter(Manga manga, Context context, int cardColor, int textColor) {
         this.manga = manga;
         urls = manga.chaptersLinks;
         this.context = context;
+        this.cardColor = cardColor;
+        this.textColor = textColor;
     }
 
     @Override
@@ -34,6 +38,9 @@ public class MangaInfoAdapter extends RecyclerView.Adapter<MangaInfoAdapter.More
     @Override
     public void onBindViewHolder(MangaInfoAdapter.MoreInfoHolder holder, final int position) {
         String url = urls[position];
+        holder.cardView.setCardBackgroundColor(cardColor);
+        holder.tv.setTextColor(textColor);
+
         holder.tv.setText("Chapter " + url.substring(url.indexOf("chapter_") + "chapter_".length()));
         holder.tv.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -62,9 +69,11 @@ public class MangaInfoAdapter extends RecyclerView.Adapter<MangaInfoAdapter.More
     public static class MoreInfoHolder extends RecyclerView.ViewHolder {
 
         TextView tv;
+        CardView cardView;
         public MoreInfoHolder(View v) {
             super(v);
             tv = v.findViewById(R.id.text_chapter_number);
+            cardView = v.findViewById(R.id.chapter_card);
         }
     }
 }

@@ -369,7 +369,7 @@ public class ReadingActivity extends AppCompatActivity {
             } catch (Exception e) {
 
                 e.printStackTrace();
-                Toast.makeText(getApplicationContext(), "Unable to load ", Toast.LENGTH_LONG).show();
+                //Toast.makeText(getApplicationContext(), "Unable to load ", Toast.LENGTH_LONG).show();
             }
             return urls;
         }
