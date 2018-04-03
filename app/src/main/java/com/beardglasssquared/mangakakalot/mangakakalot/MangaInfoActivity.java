@@ -1,18 +1,27 @@
 package com.beardglasssquared.mangakakalot.mangakakalot;
 
+import android.app.ActionBar;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.GradientDrawable;
 import android.media.Image;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.preference.PreferenceManager;
 import android.provider.ContactsContract;
+import android.support.annotation.NonNull;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.view.MenuItemCompat;
+import android.support.v4.widget.NestedScrollView;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.graphics.Palette;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -21,14 +30,18 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.Toolbar;
 
 import com.squareup.picasso.Picasso;
 import com.transitionseverywhere.TransitionManager;
@@ -353,6 +366,55 @@ public class MangaInfoActivity extends AppCompatActivity {
 
     public void setBackground(Bitmap bitmap)
     {
+        final CardView cardView = findViewById(R.id.card_view);
+        final TextView title = findViewById(R.id.title_text);
+        final TextView author = findViewById(R.id.author_text);
+        final TextView description = findViewById(R.id.discriptions_text);
+        final LinearLayout ll = findViewById(R.id.ll_more_info);
+        final CoordinatorLayout coordinatorLayout = findViewById(R.id.more_info_coordinator);
+        final View view = findViewById(R.id.gradient);
+
+        Palette.from(bitmap).generate(new Palette.PaletteAsyncListener() {
+                                          @Override
+                                          public void onGenerated(@NonNull Palette palette) {
+                                              Palette.Swatch vibSwatch = palette.getDarkVibrantSwatch();
+                                              Palette.Swatch liteSwatch = palette.getLightVibrantSwatch();
+                                              if (vibSwatch == null) {
+                                                  Toast.makeText(getApplicationContext()
+                                                          , "Null swatch :(", Toast.LENGTH_SHORT).show();
+                                                  return;
+                                              }
+
+                                              GradientDrawable gd = new GradientDrawable(
+                                                      GradientDrawable.Orientation.TOP_BOTTOM,
+                                                      new int[] {0x00ffffff,vibSwatch.getRgb()});
+                                              gd.setCornerRadius(0f);
+
+
+                                              TransitionManager.beginDelayedTransition(coordinatorLayout);
+
+                                              view.setBackgroundDrawable(gd);
+                                              coordinatorLayout.setBackgroundColor(vibSwatch.getRgb());
+                                              title.setTextColor(vibSwatch.getTitleTextColor());
+                                              cardView.setCardBackgroundColor(vibSwatch.getRgb());
+
+                                              author.setTextColor(vibSwatch.getBodyTextColor());
+                                              description.setTextColor(vibSwatch.getBodyTextColor());
+
+                                              if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                                                  Window window = getWindow();
+                                                  window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+                                                  window.setStatusBarColor(vibSwatch.getRgb());
+                                              }
+
+                                              getSupportActionBar().setBackgroundDrawable(new ColorDrawable(vibSwatch.getRgb()));
+                                              getSupportActionBar().setDisplayShowTitleEnabled(false);
+                                              getSupportActionBar().setDisplayShowTitleEnabled(true);
+
+                                          }
+                                      });
+
+
         mangaCoverSmall.setImageBitmap(bitmap);
         mangaCover = findViewById(R.id.manga_cover);
 
@@ -363,6 +425,8 @@ public class MangaInfoActivity extends AppCompatActivity {
                     .from(bitmap)
                     .into(mangaCover);
         }
+
+
     }
     public class LoadBackgroundImages extends AsyncTask<String, Void, Bitmap> {
 
