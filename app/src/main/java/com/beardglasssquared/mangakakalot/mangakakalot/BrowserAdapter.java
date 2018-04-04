@@ -84,13 +84,17 @@ public class BrowserAdapter extends RecyclerView.Adapter<BrowserAdapter.BrowserH
     public void onBindViewHolder(final BrowserAdapter.BrowserHolder holder, int position) {
         final int leftIndex = position * 2;
         final int rightIndex = position * 2 + 1;
+
+
         if (leftIndex < urls.size())
         {
-            final int[] color = new int[4];
+
+            final int[] color = new int[5];
             color[0] = Color.parseColor("#ffffff");
             color[1] = Color.parseColor("#000000");
             color[2] = Color.parseColor("#808080");
             color[3] = Color.parseColor("#ffffff");
+            color[4] = Color.parseColor("#ff000000");
 
             holder.cardL.setVisibility(View.VISIBLE);
             Picasso.with(context).load(urls.get(leftIndex).imageUrl).into(holder.imageL, new Callback() {
@@ -114,6 +118,8 @@ public class BrowserAdapter extends RecyclerView.Adapter<BrowserAdapter.BrowserH
                                 Color.colorToHSV(darkerRGB, hsv);
                                 hsv[2] *= 0.9f; // value component
                                 color[3] = Color.HSVToColor(hsv);
+                                color[4] = palette.getVibrantColor(Color.parseColor("#ffffffff"));
+
                             }
                         });
                     }
@@ -147,6 +153,7 @@ public class BrowserAdapter extends RecyclerView.Adapter<BrowserAdapter.BrowserH
                     intent.putExtra("titleColor",color[1]);
                     intent.putExtra("bodyColor",color[2]);
                     intent.putExtra("secondColor",color[3]);
+                    intent.putExtra("accentColor",color[4]);
 
 
 
@@ -159,11 +166,12 @@ public class BrowserAdapter extends RecyclerView.Adapter<BrowserAdapter.BrowserH
         }
 
         if (rightIndex < urls.size()) {
-            final int[] color = new int[4];
+            final int[] color = new int[5];
             color[0] = Color.parseColor("#ffffff");
             color[1] = Color.parseColor("#000000");
             color[2] = Color.parseColor("#808080");
             color[3] = Color.parseColor("#ffffff");
+            color[4] = Color.parseColor("#ff000000");
 
             holder.cardR.setVisibility(View.VISIBLE);
             Picasso.with(context).load(urls.get(rightIndex).imageUrl).into(holder.imageR, new Callback() {
@@ -188,6 +196,7 @@ public class BrowserAdapter extends RecyclerView.Adapter<BrowserAdapter.BrowserH
                                 Color.colorToHSV(darkerRGB, hsv);
                                 hsv[2] *= 0.9f; // value component
                                 color[3] = Color.HSVToColor(hsv);
+                                color[4] = palette.getVibrantColor(Color.parseColor("#ffffffff"));
                             }
                         });
                     }
@@ -218,7 +227,7 @@ public class BrowserAdapter extends RecyclerView.Adapter<BrowserAdapter.BrowserH
                     intent.putExtra("titleColor",color[1]);
                     intent.putExtra("bodyColor",color[2]);
                     intent.putExtra("secondColor",color[3]);
-
+                    intent.putExtra("accentColor",color[4]);
                     context.startActivity(intent);
                 }
             });

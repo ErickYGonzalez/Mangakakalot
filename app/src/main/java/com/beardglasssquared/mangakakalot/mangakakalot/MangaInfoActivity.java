@@ -62,7 +62,7 @@ public class MangaInfoActivity extends AppCompatActivity {
     Manga finishedManga;
     ImageView mangaCover, mangaCoverSmall;
     RecyclerView rv;
-    int mainColor, titleColor, bodyColor,secondColor;
+    int mainColor, titleColor, bodyColor,secondColor,accentColor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,7 +78,7 @@ public class MangaInfoActivity extends AppCompatActivity {
         titleColor = extras.getInt("titleColor");
         bodyColor = extras.getInt("bodyColor");
         secondColor = extras.getInt("secondColor");
-
+        accentColor = extras.getInt("accentColor");
 
         TextView title = findViewById(R.id.title_text);
         title.setText(name);
@@ -165,6 +165,11 @@ public class MangaInfoActivity extends AppCompatActivity {
 
             final String chapterName = "Chapter " + url.substring(url.indexOf("chapter_") + "chapter_".length());
             lastVisitedButton.setText("Continue to " + chapterName);
+            if (accentColor != mainColor) {
+                lastVisitedButton.setTextColor(accentColor);
+            } else {
+                lastVisitedButton.setTextColor(titleColor);
+            }
             lastVisitedButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
