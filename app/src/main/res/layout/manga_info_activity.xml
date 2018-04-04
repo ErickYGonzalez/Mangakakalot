@@ -186,7 +186,7 @@
                 <android.support.v7.widget.RecyclerView
                     android:id="@+id/more_info_rv"
                     android:layout_width="match_parent"
-                    android:layout_height="2000dp"
+                    android:layout_height="500dp"
                     android:layout_alignParentBottom="false"
                     android:layout_weight="1"
                     android:scrollbars="vertical">

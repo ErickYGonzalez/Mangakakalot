@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.GradientDrawable;
 import android.support.annotation.NonNull;
 import android.support.v7.graphics.Palette;
 import android.support.v7.widget.CardView;
@@ -120,6 +121,17 @@ public class BrowserAdapter extends RecyclerView.Adapter<BrowserAdapter.BrowserH
                                 color[3] = Color.HSVToColor(hsv);
                                 color[4] = palette.getVibrantColor(Color.parseColor("#ffffffff"));
 
+
+                                //colorize!
+                                holder.cardL.setCardBackgroundColor(color[0]);
+
+                                GradientDrawable gd = new GradientDrawable(
+                                        GradientDrawable.Orientation.TOP_BOTTOM,
+                                        new int[] {0x00ffffff,color[0]});
+                                gd.setCornerRadius(0f);
+
+                                holder.gradL.setBackgroundDrawable(gd);
+                                holder.titleL.setTextColor(color[1]);
                             }
                         });
                     }
@@ -130,7 +142,6 @@ public class BrowserAdapter extends RecyclerView.Adapter<BrowserAdapter.BrowserH
 
                 }
             });
-
 
             holder.titleL.setText(urls.get(leftIndex).title);
             holder.chapterL.setText(urls.get(leftIndex).chapters);
@@ -197,6 +208,16 @@ public class BrowserAdapter extends RecyclerView.Adapter<BrowserAdapter.BrowserH
                                 hsv[2] *= 0.9f; // value component
                                 color[3] = Color.HSVToColor(hsv);
                                 color[4] = palette.getVibrantColor(Color.parseColor("#ffffffff"));
+
+                                holder.cardR.setCardBackgroundColor(color[0]);
+
+                                GradientDrawable gd = new GradientDrawable(
+                                        GradientDrawable.Orientation.TOP_BOTTOM,
+                                        new int[] {0x00ffffff,color[0]});
+                                gd.setCornerRadius(0f);
+
+                                holder.gradR.setBackgroundDrawable(gd);
+                                holder.titleR.setTextColor(color[1]);
                             }
                         });
                     }
@@ -256,6 +277,9 @@ public class BrowserAdapter extends RecyclerView.Adapter<BrowserAdapter.BrowserH
         protected CardView cardL;
         protected CardView cardR;
 
+        protected View gradL;
+        protected View gradR;
+
         public BrowserHolder(View v) {
             super(v);
             imageL = v.findViewById(R.id.image_left);
@@ -269,6 +293,9 @@ public class BrowserAdapter extends RecyclerView.Adapter<BrowserAdapter.BrowserH
 
             cardL = v.findViewById(R.id.card_left);
             cardR = v.findViewById(R.id.card_right);
+
+            gradL = v.findViewById(R.id.gradL);
+            gradR = v.findViewById(R.id.gradR);
         }
     }
 }

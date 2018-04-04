@@ -17,21 +17,36 @@
         app:cardCornerRadius="10dp">
 
         <LinearLayout
+            android:id="@+id/ll_left"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:orientation="vertical">
 
-            <ImageView
-                android:id="@+id/image_left"
+            <FrameLayout
                 android:layout_width="match_parent"
-                android:layout_height="300dp"
-                android:layout_weight="1"
-                android:adjustViewBounds="true"
-                android:cropToPadding="false"
-                android:elevation="5dp"
-                android:scaleType="fitXY"
-                app:srcCompat="@mipmap/ic_launcher" />
+                android:layout_height="match_parent"
+                android:layout_weight="1">
+
+                <ImageView
+                    android:id="@+id/image_left"
+                    android:layout_width="match_parent"
+                    android:layout_height="300dp"
+                    android:layout_weight="1"
+                    android:adjustViewBounds="true"
+                    android:cropToPadding="false"
+                    android:elevation="5dp"
+                    android:scaleType="fitXY"
+                    app:srcCompat="@mipmap/ic_launcher" />
+
+                <View
+                    android:id="@+id/gradL"
+                    android:layout_width="match_parent"
+                    android:layout_height="125dp"
+                    android:layout_gravity="bottom"
+                    android:translationZ="@dimen/fab_margin" />
+
+            </FrameLayout>
 
             <TextView
                 android:id="@+id/title_left"
@@ -68,21 +83,36 @@
 
 
         <LinearLayout
+            android:id="@+id/ll_right"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:orientation="vertical">
 
-            <ImageView
-                android:id="@+id/image_right"
+            <FrameLayout
                 android:layout_width="match_parent"
-                android:layout_height="300dp"
-                android:layout_weight="1"
-                android:adjustViewBounds="true"
-                android:cropToPadding="false"
-                android:elevation="5dp"
-                android:scaleType="fitXY"
-                app:srcCompat="@mipmap/ic_launcher" />
+                android:layout_height="match_parent"
+                android:layout_weight="1">
+
+                <ImageView
+                    android:id="@+id/image_right"
+                    android:layout_width="match_parent"
+                    android:layout_height="300dp"
+                    android:layout_weight="1"
+                    android:adjustViewBounds="true"
+                    android:cropToPadding="false"
+                    android:elevation="5dp"
+                    android:scaleType="fitXY"
+                    app:srcCompat="@mipmap/ic_launcher" />
+
+                <View
+                    android:id="@+id/gradR"
+                    android:layout_width="match_parent"
+                    android:layout_height="125dp"
+                    android:layout_gravity="bottom"
+                    android:translationZ="@dimen/fab_margin" />
+
+            </FrameLayout>
 
             <TextView
                 android:id="@+id/title_right"
